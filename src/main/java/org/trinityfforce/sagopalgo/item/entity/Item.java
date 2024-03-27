@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.trinityfforce.sagopalgo.category.entity.Category;
 import org.trinityfforce.sagopalgo.global.common.Timestamped;
+import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
 import org.trinityfforce.sagopalgo.user.entity.User;
 
 @Entity
@@ -22,14 +23,20 @@ import org.trinityfforce.sagopalgo.user.entity.User;
 @AllArgsConstructor
 @Table(name = "Item")
 public class Item extends Timestamped {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    // 상품명
+    @Column(nullable = false)
+    private String name;
 
     // 시작가
     @Column(nullable = false)
     private Integer startPrice;
 
-    // 입찰 단위
+    // 입찰가
     @Column(nullable = false)
     private Integer bidUnit;
 
@@ -47,7 +54,7 @@ public class Item extends Timestamped {
 
     // 카테고리
     @ManyToOne
-    @JoinColumn(name="category_id")
+    @JoinColumn(name = "category_id")
     private Category category;
 
     // 작성자(게시자)
@@ -55,8 +62,23 @@ public class Item extends Timestamped {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public void updateBidItem(Integer price) {
-        this.highestPrice = price;
-        this.bidCount++;
+    public Item(ItemRequest itemRequest, Category category, User user) {
+        this.name = itemRequest.getName();
+        this.startPrice = itemRequest.getStartPrice();
+        this.bidUnit = itemRequest.getBidUnit();
+        this.bidCount = 0;
+        this.deadline = itemRequest.getDeadLine();
+        this.highestPrice = itemRequest.getStartPrice();
+        this.category = category;
+        this.user = user;
+    }
+
+    public void update(ItemRequest itemRequest, Category category) {
+        this.name = itemRequest.getName();
+        this.startPrice = itemRequest.getStartPrice();
+        this.bidUnit = itemRequest.getBidUnit();
+        this.deadline = itemRequest.getDeadLine();
+        this.highestPrice = itemRequest.getStartPrice();
+        this.category = category;
     }
 }
