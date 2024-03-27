@@ -5,4 +5,5 @@ import org.trinityfforce.sagopalgo.user.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    boolean existsByEmail(String email);
 }

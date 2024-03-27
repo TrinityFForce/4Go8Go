@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.trinityfforce.sagopalgo.user.dto.request.SignUpRequestDto;
 
 @Entity
 @Table(name = "users")
@@ -30,4 +31,9 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    public User(SignUpRequestDto requestDto, String encryptpassword) {
+        this.email = requestDto.getEmail();
+        this.password = encryptpassword;
+        this.username = requestDto.getUsername();
+    }
 }
