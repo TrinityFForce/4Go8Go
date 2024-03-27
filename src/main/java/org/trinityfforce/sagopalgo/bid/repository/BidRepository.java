@@ -5,4 +5,5 @@ import org.trinityfforce.sagopalgo.bid.entity.Bid;
 
 public interface BidRepository extends JpaRepository<Bid,Long> {
 
+    boolean existsByItemId(Long id);
 }
