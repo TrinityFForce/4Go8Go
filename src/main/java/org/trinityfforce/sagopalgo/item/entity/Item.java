@@ -29,7 +29,7 @@ public class Item extends Timestamped {
     @Column(nullable = false)
     private Integer startPrice;
 
-    // 입찰가
+    // 입찰 단위
     @Column(nullable = false)
     private Integer bidUnit;
 
@@ -54,4 +54,9 @@ public class Item extends Timestamped {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    public void updateBidItem(Integer price) {
+        this.highestPrice = price;
+        this.bidCount++;
+    }
 }
