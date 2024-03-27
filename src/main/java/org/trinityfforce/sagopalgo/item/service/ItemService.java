@@ -3,10 +3,8 @@ package org.trinityfforce.sagopalgo.item.service;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.trinityfforce.sagopalgo.bid.entity.Bid;
 import org.trinityfforce.sagopalgo.bid.repository.BidRepository;
 import org.trinityfforce.sagopalgo.category.entity.Category;
 import org.trinityfforce.sagopalgo.category.repository.CategoryRepository;
@@ -40,8 +38,9 @@ public class ItemService {
         List<Item> itemList = itemRepository.findAll();
         List<ItemResponse> itemResponseList = new ArrayList<>();
 
-        for(Item item : itemList)
+        for (Item item : itemList) {
             itemResponseList.add(new ItemResponse(item));
+        }
 
         return itemResponseList;
     }
@@ -50,9 +49,11 @@ public class ItemService {
         List<Item> itemList = itemRepository.findAll();
         List<ItemResponse> itemResponseList = new ArrayList<>();
 
-        for(Item item : itemList)
-            if(item.getName().contains(itemName))
+        for (Item item : itemList) {
+            if (item.getName().contains(itemName)) {
                 itemResponseList.add(new ItemResponse(item));
+            }
+        }
 
         return itemResponseList;
     }
@@ -62,8 +63,9 @@ public class ItemService {
         List<Item> itemList = itemRepository.findAllByCategory(category);
         List<ItemResponse> itemResponseList = new ArrayList<>();
 
-        for(Item item : itemList)
+        for (Item item : itemList) {
             itemResponseList.add(new ItemResponse(item));
+        }
 
         return itemResponseList;
     }
@@ -99,34 +101,36 @@ public class ItemService {
         return new ResultResponse(200, "OK", "삭제되었습니다.");
     }
 
-    private User getUser(Long userId){
+    private User getUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
-            ()-> new NullPointerException("해당 유저가 존재하지 않습니다.")
+            () -> new NullPointerException("해당 유저가 존재하지 않습니다.")
         );
         return user;
     }
 
-    private Category getCategory(String name){
+    private Category getCategory(String name) {
         Category category = categoryRepository.findByName(name).orElseThrow(
-            ()-> new NullPointerException("해당 카테고리가 존재하지 않습니다.")
+            () -> new NullPointerException("해당 카테고리가 존재하지 않습니다.")
         );
         return category;
     }
 
-    private Item getItem(Long itemId){
+    private Item getItem(Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(
-            ()-> new NullPointerException("해당 상품이 존재하지 않습니다.")
+            () -> new NullPointerException("해당 상품이 존재하지 않습니다.")
         );
         return item;
     }
 
-    private void isAuthorized(Item item, Long userId){
-        if(!item.getUser().getId().equals(userId))
+    private void isAuthorized(Item item, Long userId) {
+        if (!item.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("상품 등록자만 수정, 삭제가 가능합니다.");
+        }
     }
 
-    private void isBidding(Item item){
-        if(bidRepository.existsByItemId(item.getId()))
+    private void isBidding(Item item) {
+        if (bidRepository.existsByItemId(item.getId())) {
             throw new IllegalArgumentException("해당 상품에 입찰자가 존재합니다.");
+        }
     }
 }

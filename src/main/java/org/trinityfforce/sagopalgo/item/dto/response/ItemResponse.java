@@ -8,6 +8,7 @@ import org.trinityfforce.sagopalgo.item.entity.Item;
 @Getter
 @AllArgsConstructor
 public class ItemResponse {
+
     private Long id;
     private String name;
     private Integer startPrice;
@@ -18,7 +19,7 @@ public class ItemResponse {
     private String category;
     private String username;
 
-    public ItemResponse(Item item){
+    public ItemResponse(Item item) {
         this.id = item.getId();
         this.name = item.getName();
         this.startPrice = item.getStartPrice();

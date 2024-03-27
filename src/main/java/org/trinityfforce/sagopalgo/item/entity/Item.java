@@ -23,7 +23,9 @@ import org.trinityfforce.sagopalgo.user.entity.User;
 @AllArgsConstructor
 @Table(name = "Item")
 public class Item extends Timestamped {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // 상품명
@@ -52,7 +54,7 @@ public class Item extends Timestamped {
 
     // 카테고리
     @ManyToOne
-    @JoinColumn(name="category_id")
+    @JoinColumn(name = "category_id")
     private Category category;
 
     // 작성자(게시자)
@@ -60,7 +62,7 @@ public class Item extends Timestamped {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Item(ItemRequest itemRequest, Category category, User user){
+    public Item(ItemRequest itemRequest, Category category, User user) {
         this.name = itemRequest.getName();
         this.startPrice = itemRequest.getStartPrice();
         this.bidUnit = itemRequest.getBidUnit();
@@ -71,7 +73,7 @@ public class Item extends Timestamped {
         this.user = user;
     }
 
-    public void update(ItemRequest itemRequest, Category category){
+    public void update(ItemRequest itemRequest, Category category) {
         this.name = itemRequest.getName();
         this.startPrice = itemRequest.getStartPrice();
         this.bidUnit = itemRequest.getBidUnit();

@@ -11,21 +11,21 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ItemRequest {
 
-    @NotBlank
+    @NotBlank(message = "상품 이름은 필수 항목입니다.")
     private String name;
 
-    @NotBlank
-    @PositiveOrZero
+    @NotBlank(message = "최소 입찰액은 필수 항목입니다.")
+    @PositiveOrZero(message = "최소 입찰액은 0원 이거나 커야합니다.")
     private Integer startPrice;
 
-    @NotBlank
-    @PositiveOrZero
+    @NotBlank(message = "입찰단위는 필수 항목입니다.")
+    @PositiveOrZero(message = "입찰단위는 0원 이거나 커야합니다.")
     private Integer bidUnit;
 
-    @NotBlank
-    @Future
+    @NotBlank(message = "경매 종료일은 필수 항목입니다.")
+    @Future(message = "경매 종료일은 미래여야 합니다.")
     private LocalDateTime deadLine;
 
-    @NotBlank
+    @NotBlank(message = "카테고리는 필수 항목입니다.")
     private String category;
 }
