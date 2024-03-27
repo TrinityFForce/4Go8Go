@@ -44,7 +44,7 @@ public class ItemContoller {
     @Operation(summary = "상품 목록 조회", description = "전체 상품 목록을 조회한다.")
     public ResponseEntity<List<ItemResponse>> getItem() {
         return ResponseEntity
-            .status(HttpStatus.CREATED)
+            .status(HttpStatus.OK)
             .body(itemService.getItem());
     }
 
@@ -52,7 +52,7 @@ public class ItemContoller {
     @Operation(summary = "상품 검색", description = "검색어를 통해 상품을 조회한다.")
     public ResponseEntity<List<ItemResponse>> searchItem(@PathVariable String itemName) {
         return ResponseEntity
-            .status(HttpStatus.CREATED)
+            .status(HttpStatus.OK)
             .body(itemService.searchItem(itemName));
     }
 
@@ -60,7 +60,7 @@ public class ItemContoller {
     @Operation(summary = "카테고리별 상품 조회", description = "카테고리를 통해 상품을 조회한다.")
     public ResponseEntity<List<ItemResponse>> getCategoryItem(@PathVariable String categoryName) {
         return ResponseEntity
-            .status(HttpStatus.CREATED)
+            .status(HttpStatus.OK)
             .body(itemService.getCategoryItem(categoryName));
     }
 
@@ -68,7 +68,7 @@ public class ItemContoller {
     @Operation(summary = "상품 단일 조회", description = "상품 ID를 통해 상품을 조회한다.")
     public ResponseEntity<ItemResponse> getItemById(@PathVariable Long itemId) {
         return ResponseEntity
-            .status(HttpStatus.CREATED)
+            .status(HttpStatus.OK)
             .body(itemService.getItemById(itemId));
     }
 
@@ -78,7 +78,7 @@ public class ItemContoller {
         @RequestBody ItemRequest itemRequest,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity
-            .status(HttpStatus.CREATED)
+            .status(HttpStatus.OK)
             .body(itemService.updateItem(itemId, itemRequest, userDetails.getUser()));
     }
 

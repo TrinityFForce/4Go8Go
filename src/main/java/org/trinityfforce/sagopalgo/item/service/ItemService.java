@@ -31,7 +31,7 @@ public class ItemService {
         User owner = getUser(user.getId());
 
         itemRepository.save(new Item(itemRequest, category, owner));
-        return new ResultResponse(201, "CREATED", "등록되었습니다.");
+        return new ResultResponse(200, "OK", "등록되었습니다.");
     }
 
     public List<ItemResponse> getItem() {
@@ -86,7 +86,7 @@ public class ItemService {
 
         item.update(itemRequest, category);
 
-        return new ResultResponse(201, "CREATED", "수정되었습니다.");
+        return new ResultResponse(200, "OK", "수정되었습니다.");
     }
 
     @Transactional
