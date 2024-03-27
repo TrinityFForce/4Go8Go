@@ -41,6 +41,7 @@ public class User {
         this.email = requestDto.getEmail();
         this.password = encryptpassword;
         this.username = requestDto.getUsername();
+        this.role = UserRoleEnum.USER;
     }
 
     public User(Long id, String email, String username, String role) {
