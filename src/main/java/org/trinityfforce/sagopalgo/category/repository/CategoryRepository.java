@@ -6,5 +6,7 @@ import org.trinityfforce.sagopalgo.category.entity.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    Optional<Category> findByName(String category);
+    boolean existsByName(String name);
+
+    Optional<Category> findByName(String name);
 }

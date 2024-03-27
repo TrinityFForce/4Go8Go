@@ -2,6 +2,8 @@ package org.trinityfforce.sagopalgo.user.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -9,6 +11,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.trinityfforce.sagopalgo.user.dto.request.SignUpRequestDto;
 
 @Entity
 @Table(name = "users")
@@ -30,4 +33,21 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserRoleEnum role;
+
+    public User(SignUpRequestDto requestDto, String encryptpassword) {
+        this.email = requestDto.getEmail();
+        this.password = encryptpassword;
+        this.username = requestDto.getUsername();
+        this.role = UserRoleEnum.USER;
+    }
+
+    public User(Long id, String email, String username, String role) {
+        this.id = id;
+        this.email = email;
+        this.username = username;
+        this.role = role.equals("ROLE_ADMIN") ? UserRoleEnum.ADMIN : UserRoleEnum.USER;
+    }
 }
