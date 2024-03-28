@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.trinityfforce.sagopalgo.category.entity.Category;
 import org.trinityfforce.sagopalgo.category.repository.CategoryRepository;
 import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
+import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 import org.trinityfforce.sagopalgo.item.dto.response.ResultResponse;
 import org.trinityfforce.sagopalgo.item.entity.Item;
@@ -45,19 +46,14 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "item", key = "#itemName", cacheManager = "cacheManager", unless = "#result == null")
-    public List<ItemResponse> searchItem(String itemName) {
-        List<Item> itemList = itemRepository.searchByName(itemName);
+    @Cacheable(value = "item", key = "#searchRequest", cacheManager = "cacheManager", unless = "#result == null")
+    public List<ItemResponse> searchItem(SearchRequest searchRequest) {
+        List<Item> itemList = itemRepository.searchItem(searchRequest);
         return itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<ItemResponse> getCategoryItem(String categoryName) {
-        List<Item> itemList = itemRepository.searchByCategory(categoryName);
-        return itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
+    @Cacheable(value = "item", key = "#itemId", cacheManager = "cacheManager", unless = "#result == null")
     public ItemResponse getItemById(Long itemId) throws BadRequestException {
         Item item = getItem(itemId);
 

@@ -1,9 +1,11 @@
 package org.trinityfforce.sagopalgo.item.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
+import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
 import org.trinityfforce.sagopalgo.item.entity.Item;
 import org.trinityfforce.sagopalgo.item.entity.QItem;
 
@@ -11,27 +13,25 @@ import org.trinityfforce.sagopalgo.item.entity.QItem;
 public class ItemRepositoryQueryImpl implements ItemRepositoryQuery {
 
     private final JPAQueryFactory jpaQueryFactory;
+    private QItem qItem = QItem.item;
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Item> searchByName(String itemName) {
-        QItem qItem = QItem.item;
-
+    @Transactional
+    public List<Item> searchItem(SearchRequest searchRequest) {
         return jpaQueryFactory
             .selectFrom(qItem)
-            .where(qItem.name.like("%" + itemName + "%"))
+            .where(eqName(searchRequest.getName()),
+                eqCategory(searchRequest.getCategory()))
             .fetch();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<Item> searchByCategory(String categoryName) {
-        QItem qItem = QItem.item;
-
-        return jpaQueryFactory
-            .selectFrom(qItem)
-            .where(qItem.category.name.like(categoryName))
-            .fetch();
+    public BooleanExpression eqName(String itemName) {
+        return itemName != null ? qItem.name.like(itemName + "%") : null;
     }
+
+    public BooleanExpression eqCategory(String category) {
+        return category != null ? qItem.category.name.like(category) : null;
+    }
+
 
 }
