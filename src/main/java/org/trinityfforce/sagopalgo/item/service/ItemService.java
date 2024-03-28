@@ -1,6 +1,5 @@
 package org.trinityfforce.sagopalgo.item.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +8,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.trinityfforce.sagopalgo.bid.repository.BidRepository;
 import org.trinityfforce.sagopalgo.category.entity.Category;
 import org.trinityfforce.sagopalgo.category.repository.CategoryRepository;
 import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
@@ -47,23 +45,15 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "item", key = "#itemName", cacheManager = "cacheManager", unless = "#result == null")
     public List<ItemResponse> searchItem(String itemName) {
-        List<Item> itemList = itemRepository.findAll();
-        List<ItemResponse> itemResponseList = new ArrayList<>();
-
-        for (Item item : itemList) {
-            if (item.getName().contains(itemName)) {
-                itemResponseList.add(new ItemResponse(item));
-            }
-        }
-
-        return itemResponseList;
+        List<Item> itemList = itemRepository.searchByName(itemName);
+        return itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public List<ItemResponse> getCategoryItem(String categoryName) {
-        Category category = getCategory(categoryName);
-        List<Item> itemList = itemRepository.findAllByCategory(category);
+        List<Item> itemList = itemRepository.searchByCategory(categoryName);
         return itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList());
     }
 
@@ -130,7 +120,7 @@ public class ItemService {
     }
 
     private void isBidding(Item item) throws BadRequestException {
-        if (item.getBidCount()>0) {
+        if (item.getBidCount() > 0) {
             throw new BadRequestException("해당 상품에 입찰자가 존재합니다.");
         }
     }
