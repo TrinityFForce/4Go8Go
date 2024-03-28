@@ -3,6 +3,9 @@ package org.trinityfforce.sagopalgo.item.service;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.trinityfforce.sagopalgo.bid.repository.BidRepository;
@@ -25,6 +28,7 @@ public class ItemService {
     private final UserRepository userRepository;
 
     @Transactional
+    @CacheEvict(value = "item", key = "#item.id", allEntries = true)
     public ResultResponse createItem(ItemRequest itemRequest, User user) {
         Category category = getCategory(itemRequest.getCategory());
         User owner = getUser(user.getId());
@@ -33,6 +37,8 @@ public class ItemService {
         return new ResultResponse(200, "OK", "등록되었습니다.");
     }
 
+    @Transactional(readOnly = true)
+    @Cacheable(value = "item", key = "#item.id", cacheManager = "cacheManager", unless = "#result == null")
     public List<ItemResponse> getItem() {
         List<Item> itemList = itemRepository.findAll();
         List<ItemResponse> itemResponseList = new ArrayList<>();
@@ -44,6 +50,8 @@ public class ItemService {
         return itemResponseList;
     }
 
+    @Transactional(readOnly = true)
+    @Cacheable(value = "item", key = "#item.id", cacheManager = "cacheManager", unless = "#result == null")
     public List<ItemResponse> searchItem(String itemName) {
         List<Item> itemList = itemRepository.findAll();
         List<ItemResponse> itemResponseList = new ArrayList<>();
@@ -57,6 +65,8 @@ public class ItemService {
         return itemResponseList;
     }
 
+    @Transactional(readOnly = true)
+    @Cacheable(value = "item", key = "#item.id", cacheManager = "cacheManager", unless = "#result == null")
     public List<ItemResponse> getCategoryItem(String categoryName) {
         Category category = getCategory(categoryName);
         List<Item> itemList = itemRepository.findAllByCategory(category);
@@ -69,14 +79,18 @@ public class ItemService {
         return itemResponseList;
     }
 
-    public ItemResponse getItemById(Long itemId) {
+    @Transactional(readOnly = true)
+    @Cacheable(value = "item", key = "#item.id", cacheManager = "cacheManager", unless = "#result == null")
+    public ItemResponse getItemById(Long itemId) throws BadRequestException {
         Item item = getItem(itemId);
 
         return new ItemResponse(item);
     }
 
     @Transactional
-    public ResultResponse updateItem(Long itemId, ItemRequest itemRequest, User user) {
+    @CacheEvict(value = "item", key = "#item.id", allEntries = true)
+    public ResultResponse updateItem(Long itemId, ItemRequest itemRequest, User user)
+        throws BadRequestException {
         Item item = getItem(itemId);
         Category category = getCategory(itemRequest.getCategory());
         User owner = getUser(user.getId());
@@ -89,7 +103,8 @@ public class ItemService {
     }
 
     @Transactional
-    public ResultResponse deleteItem(Long itemId, User user) {
+    @CacheEvict(value = "item", key = "#item.id", allEntries = true)
+    public ResultResponse deleteItem(Long itemId, User user) throws BadRequestException {
         Item item = getItem(itemId);
         User owner = getUser(user.getId());
         isAuthorized(item, owner.getId());
@@ -114,22 +129,22 @@ public class ItemService {
         return category;
     }
 
-    private Item getItem(Long itemId) {
+    private Item getItem(Long itemId) throws BadRequestException {
         Item item = itemRepository.findById(itemId).orElseThrow(
-            () -> new NullPointerException("해당 상품이 존재하지 않습니다.")
+            () -> new BadRequestException("해당 상품이 존재하지 않습니다.")
         );
         return item;
     }
 
-    private void isAuthorized(Item item, Long userId) {
+    private void isAuthorized(Item item, Long userId) throws BadRequestException {
         if (!item.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("상품 등록자만 수정, 삭제가 가능합니다.");
+            throw new BadRequestException("상품 등록자만 수정, 삭제가 가능합니다.");
         }
     }
 
-    private void isBidding(Item item) {
+    private void isBidding(Item item) throws BadRequestException {
         if (item.getBidCount()>0) {
-            throw new IllegalArgumentException("해당 상품에 입찰자가 존재합니다.");
+            throw new BadRequestException("해당 상품에 입찰자가 존재합니다.");
         }
     }
 }
