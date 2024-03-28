@@ -1,12 +1,14 @@
 package org.trinityfforce.sagopalgo.bid.service;
 
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.trinityfforce.sagopalgo.bid.dto.BidRequestDto;
 import org.trinityfforce.sagopalgo.bid.dto.BidResponseDto;
 import org.trinityfforce.sagopalgo.bid.entity.Bid;
 import org.trinityfforce.sagopalgo.bid.repository.BidRepository;
+import org.trinityfforce.sagopalgo.global.anotation.WithDistributedLock;
 import org.trinityfforce.sagopalgo.item.entity.Item;
 import org.trinityfforce.sagopalgo.item.repository.ItemRepository;
 import org.trinityfforce.sagopalgo.user.entity.User;
@@ -20,6 +22,7 @@ public class BidService {
 
     private final BidRepository bidRepository;
     private final ItemRepository itemRepository;
+    private final RedissonClient redissonClient;
 
     public List<BidResponseDto> getBidOnItem(Long itemId) {
         return bidRepository.findAllByItemId(itemId).stream().map(BidResponseDto::new).toList();
@@ -30,6 +33,7 @@ public class BidService {
     }
 
     @Transactional
+    @WithDistributedLock(lockName = "#itemId")
     public void placeBid(Long itemId, User user, BidRequestDto requestDto) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new IllegalArgumentException("해당 ID를 가진 상품은 존재하지 않습니다.")
