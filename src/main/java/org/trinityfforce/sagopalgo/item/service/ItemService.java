@@ -22,7 +22,6 @@ public class ItemService {
 
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
-    private final BidRepository bidRepository;
     private final UserRepository userRepository;
 
     @Transactional
@@ -129,7 +128,7 @@ public class ItemService {
     }
 
     private void isBidding(Item item) {
-        if (bidRepository.existsByItemId(item.getId())) {
+        if (item.getBidCount()>0) {
             throw new IllegalArgumentException("해당 상품에 입찰자가 존재합니다.");
         }
     }
