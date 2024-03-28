@@ -14,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.trinityfforce.sagopalgo.global.security.JwtAuthenticationFilter;
 import org.trinityfforce.sagopalgo.global.security.JwtAuthorizationFilter;
 import org.trinityfforce.sagopalgo.global.security.UserDetailsServiceImpl;
@@ -23,7 +25,7 @@ import org.trinityfforce.sagopalgo.global.security.jwt.JwtUtil;
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity(securedEnabled = true)
-public class WebSecurityConfig {
+public class WebSecurityConfig implements WebMvcConfigurer {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
@@ -62,17 +64,28 @@ public class WebSecurityConfig {
             sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
 
+
         http.authorizeHttpRequests((authorizeHttpRequests) ->
             authorizeHttpRequests
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                 .permitAll()// resources 접근 허용
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/api/v1/users/**").permitAll()
+                .requestMatchers("/api/v1/events/**").permitAll()
                 .anyRequest().authenticated()
         );
+
 
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+            .allowedOrigins("http://localhost:3000") // React 애플리케이션의 도메인
+            .allowedMethods("GET", "POST", "PUT", "DELETE")
+            .allowCredentials(true);
     }
 }
