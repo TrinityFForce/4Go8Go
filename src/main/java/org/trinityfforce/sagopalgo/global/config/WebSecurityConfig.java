@@ -71,7 +71,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .permitAll()// resources 접근 허용
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/api/v1/users/**").permitAll()
-                .requestMatchers("/api/v1/events/**").permitAll()
                 .anyRequest().authenticated()
         );
 
