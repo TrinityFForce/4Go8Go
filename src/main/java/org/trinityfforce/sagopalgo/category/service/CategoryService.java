@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.trinityfforce.sagopalgo.category.dto.request.AddCategoryRequestDto;
@@ -44,6 +45,7 @@ public class CategoryService {
     }
 
     @Transactional
+    @CacheEvict(value = "item", allEntries = true)
     public ModifyCategoryResponseDto modifyCategory(Long categorieId,
         ModifyCategoryRequestDto requestDto)
         throws BadRequestException {

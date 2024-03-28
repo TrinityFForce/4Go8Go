@@ -2,6 +2,7 @@ package org.trinityfforce.sagopalgo.item.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.cache.annotation.CacheEvict;
@@ -28,7 +29,7 @@ public class ItemService {
     private final UserRepository userRepository;
 
     @Transactional
-    @CacheEvict(value = "item", key = "#item.id", allEntries = true)
+    @CacheEvict(value = "item", allEntries = true)
     public ResultResponse createItem(ItemRequest itemRequest, User user) {
         Category category = getCategory(itemRequest.getCategory());
         User owner = getUser(user.getId());
@@ -38,20 +39,19 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "item", key = "#item.id", cacheManager = "cacheManager", unless = "#result == null")
+    @Cacheable(value = "item", key = "#root.methodName", cacheManager = "cacheManager", unless = "#result == null")
     public List<ItemResponse> getItem() {
         List<Item> itemList = itemRepository.findAll();
         List<ItemResponse> itemResponseList = new ArrayList<>();
+        for (Item item : itemList)
+                itemResponseList.add(new ItemResponse(item));
 
-        for (Item item : itemList) {
-            itemResponseList.add(new ItemResponse(item));
-        }
 
         return itemResponseList;
+//        return itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "item", key = "#item.id", cacheManager = "cacheManager", unless = "#result == null")
     public List<ItemResponse> searchItem(String itemName) {
         List<Item> itemList = itemRepository.findAll();
         List<ItemResponse> itemResponseList = new ArrayList<>();
@@ -66,7 +66,6 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "item", key = "#item.id", cacheManager = "cacheManager", unless = "#result == null")
     public List<ItemResponse> getCategoryItem(String categoryName) {
         Category category = getCategory(categoryName);
         List<Item> itemList = itemRepository.findAllByCategory(category);
@@ -80,7 +79,6 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "item", key = "#item.id", cacheManager = "cacheManager", unless = "#result == null")
     public ItemResponse getItemById(Long itemId) throws BadRequestException {
         Item item = getItem(itemId);
 
@@ -88,7 +86,7 @@ public class ItemService {
     }
 
     @Transactional
-    @CacheEvict(value = "item", key = "#item.id", allEntries = true)
+    @CacheEvict(value = "item", allEntries = true)
     public ResultResponse updateItem(Long itemId, ItemRequest itemRequest, User user)
         throws BadRequestException {
         Item item = getItem(itemId);
@@ -103,7 +101,7 @@ public class ItemService {
     }
 
     @Transactional
-    @CacheEvict(value = "item", key = "#item.id", allEntries = true)
+    @CacheEvict(value = "item", allEntries = true)
     public ResultResponse deleteItem(Long itemId, User user) throws BadRequestException {
         Item item = getItem(itemId);
         User owner = getUser(user.getId());
