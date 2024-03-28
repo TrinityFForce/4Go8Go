@@ -81,4 +81,9 @@ public class Item extends Timestamped {
         this.highestPrice = itemRequest.getStartPrice();
         this.category = category;
     }
+
+    public void updateBidItem(Integer price) {
+        this.highestPrice = price;
+        this.bidCount++;
+    }
 }
