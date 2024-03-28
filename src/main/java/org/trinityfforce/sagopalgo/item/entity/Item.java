@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.trinityfforce.sagopalgo.category.entity.Category;
 import org.trinityfforce.sagopalgo.global.common.Timestamped;
 import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
@@ -22,6 +24,8 @@ import org.trinityfforce.sagopalgo.user.entity.User;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "Item")
+@SQLDelete(sql = "UPDATE Item SET deleted_at=CURRENT_TIMESTAMP where id=?")
+@Where(clause = "deleted_at IS NULL")
 public class Item extends Timestamped {
 
     @Id

@@ -42,13 +42,8 @@ public class ItemService {
     @Cacheable(value = "item", key = "#root.methodName", cacheManager = "cacheManager", unless = "#result == null")
     public List<ItemResponse> getItem() {
         List<Item> itemList = itemRepository.findAll();
-        List<ItemResponse> itemResponseList = new ArrayList<>();
-        for (Item item : itemList)
-                itemResponseList.add(new ItemResponse(item));
 
-
-        return itemResponseList;
-//        return itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList());
+        return itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -69,13 +64,7 @@ public class ItemService {
     public List<ItemResponse> getCategoryItem(String categoryName) {
         Category category = getCategory(categoryName);
         List<Item> itemList = itemRepository.findAllByCategory(category);
-        List<ItemResponse> itemResponseList = new ArrayList<>();
-
-        for (Item item : itemList) {
-            itemResponseList.add(new ItemResponse(item));
-        }
-
-        return itemResponseList;
+        return itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
