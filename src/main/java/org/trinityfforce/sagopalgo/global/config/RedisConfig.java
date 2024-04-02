@@ -1,6 +1,5 @@
 package org.trinityfforce.sagopalgo.global.config;
 
-import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -16,6 +15,9 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.time.Duration;
+import java.util.HashMap;
 
 @EnableRedisRepositories // redis 활성화
 @EnableCaching
@@ -46,6 +48,15 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return redisTemplate;
+    }
+
+    @Bean
+    public RedisTemplate<String, HashMap<String, Object>> hashMapRedisTemplate() {
+        RedisTemplate<String, HashMap<String, Object>> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        return  redisTemplate;
     }
 
     // 캐시 매니저
