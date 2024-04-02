@@ -7,7 +7,6 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.trinityfforce.sagopalgo.global.security.UserDetailsImpl;
 import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
+import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 import org.trinityfforce.sagopalgo.item.dto.response.ResultResponse;
 import org.trinityfforce.sagopalgo.item.service.ItemService;
@@ -45,16 +45,10 @@ public class ItemContoller {
         return ResponseEntity.ok(itemService.getItem());
     }
 
-    @GetMapping("/names/{itemName}")
+    @GetMapping("/search")
     @Operation(summary = "상품 검색", description = "검색어를 통해 상품을 조회한다.")
-    public ResponseEntity<List<ItemResponse>> searchItem(@PathVariable String itemName) {
-        return ResponseEntity.ok(itemService.searchItem(itemName));
-    }
-
-    @GetMapping("/categories/{categoryName}")
-    @Operation(summary = "카테고리별 상품 조회", description = "카테고리를 통해 상품을 조회한다.")
-    public ResponseEntity<List<ItemResponse>> getCategoryItem(@PathVariable String categoryName) {
-        return ResponseEntity.ok(itemService.getCategoryItem(categoryName));
+    public ResponseEntity<List<ItemResponse>> searchItem(@RequestBody SearchRequest searchRequest) {
+        return ResponseEntity.ok(itemService.searchItem(searchRequest));
     }
 
     @GetMapping("/{itemId}")
@@ -69,7 +63,8 @@ public class ItemContoller {
     public ResponseEntity<ResultResponse> updateItem(@PathVariable Long itemId,
         @RequestBody ItemRequest itemRequest,
         @AuthenticationPrincipal UserDetailsImpl userDetails) throws BadRequestException {
-        return ResponseEntity.ok(itemService.updateItem(itemId, itemRequest, userDetails.getUser()));
+        return ResponseEntity.ok(
+            itemService.updateItem(itemId, itemRequest, userDetails.getUser()));
     }
 
     @DeleteMapping("/{itemId}")
