@@ -5,19 +5,16 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.trinityfforce.sagopalgo.bid.dto.BidItemResponseDto;
 import org.trinityfforce.sagopalgo.bid.dto.BidRequestDto;
-import org.trinityfforce.sagopalgo.bid.dto.BidUserResponseDto;
+import org.trinityfforce.sagopalgo.bid.dto.BidResponseDto;
 import org.trinityfforce.sagopalgo.bid.entity.Bid;
 import org.trinityfforce.sagopalgo.bid.repository.BidRepository;
 import org.trinityfforce.sagopalgo.item.entity.Item;
 import org.trinityfforce.sagopalgo.item.repository.ItemRepository;
 import org.trinityfforce.sagopalgo.user.entity.User;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,32 +25,12 @@ public class BidService {
     private final BidRepository bidRepository;
     private final RedisTemplate<String, HashMap<String, Object>> hashMapRedisTemplate;
 
-    public List<BidItemResponseDto> getBidOnItem(Long itemId) {
-        String bidItemHistoryKey = "Bid:Item:" + itemId;
-        List<HashMap<String, Object>> bidItemHistory = hashMapRedisTemplate.opsForList().range(bidItemHistoryKey, 0 , -1);
-
-        if (bidItemHistory == null) {
-            return Collections.emptyList();
-        }
-
-        return bidItemHistory.stream().map(bidMap -> new BidItemResponseDto(
-                (Long) bidMap.get("userId"),
-                (Integer) bidMap.get("price")
-        )).collect(Collectors.toList());
+    public List<BidResponseDto> getBidOnItem(Long itemId) {
+        return bidRepository.findAllByItemId(itemId).stream().map(BidResponseDto::new).toList();
     }
 
-    public List<BidUserResponseDto> getBidOnUser(Long userId) {
-        String bidUserHistoryKey = "Bid:User:" + userId;
-        List<HashMap<String, Object>> bidUserHistory = hashMapRedisTemplate.opsForList().range(bidUserHistoryKey, 0 , -1);
-
-        if (bidUserHistory == null) {
-            return Collections.emptyList();
-        }
-
-        return bidUserHistory.stream().map(bidMap -> new BidUserResponseDto(
-                (Long) bidMap.get("itemId"),
-                (Integer) bidMap.get("price")
-        )).collect(Collectors.toList());
+    public List<BidResponseDto> getBidOnUser(Long userId) {
+        return bidRepository.findAllByUserId(userId).stream().map(BidResponseDto::new).toList();
     }
 
     @Transactional
