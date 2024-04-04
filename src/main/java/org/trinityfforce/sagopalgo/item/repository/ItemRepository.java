@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 import org.trinityfforce.sagopalgo.item.entity.Item;
 
 public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositoryQuery {
-
     @Modifying
     @Query("UPDATE Item i SET i.bidCount = i.bidCount + 1, i.highestPrice = :price WHERE i.id = :id")
     void updateItem(@Param("id") Long id, @Param("price") Integer price);
