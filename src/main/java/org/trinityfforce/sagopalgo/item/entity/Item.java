@@ -78,6 +78,7 @@ public class Item extends Timestamped {
 
     public void update(ItemRequest itemRequest, Category category) {
         this.name = itemRequest.getName();
+        this.startDate = itemRequest.getStartDate();
         this.startPrice = itemRequest.getStartPrice();
         this.bidUnit = itemRequest.getBidUnit();
         this.highestPrice = itemRequest.getStartPrice();
