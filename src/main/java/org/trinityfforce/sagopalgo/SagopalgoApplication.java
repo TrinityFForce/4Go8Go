@@ -12,5 +12,6 @@ public class SagopalgoApplication {
         SpringApplication.run(SagopalgoApplication.class, args);
     }
     // CICD TEST 1
+    // CICD TEST 2
 
 }
