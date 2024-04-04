@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.trinityfforce.sagopalgo.bid.dto.BidItemResponseDto;
 import org.trinityfforce.sagopalgo.bid.dto.BidRequestDto;
 import org.trinityfforce.sagopalgo.bid.dto.BidUserResponseDto;
+import org.trinityfforce.sagopalgo.global.anotation.WithDistributedLock;
 import org.trinityfforce.sagopalgo.item.entity.Item;
 import org.trinityfforce.sagopalgo.item.repository.ItemRepository;
 import org.trinityfforce.sagopalgo.user.entity.User;
