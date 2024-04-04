@@ -16,6 +16,7 @@ import org.trinityfforce.sagopalgo.user.entity.User;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -46,10 +47,16 @@ public class BidService {
         bidInfo.put("userId", user.getId());
         bidInfo.put("price", requestDto.getPrice());
         bidInfo.put("bidUnit", bidUnit);
-        hashMapRedisTemplate.opsForValue().set(itemKey, bidInfo);
+
+        // TTL 설정
+        Long ttl = hashMapRedisTemplate.getExpire(itemKey, TimeUnit.SECONDS);
+        if (ttl != null && (ttl == -1 || ttl == -2)) {
+            hashMapRedisTemplate.opsForValue().set(itemKey, bidInfo, 12 * 60 * 60, TimeUnit.SECONDS);
+        } else if (ttl != null){
+            hashMapRedisTemplate.opsForValue().set(itemKey, bidInfo, ttl, TimeUnit.SECONDS);
+        }
 
         bidRepository.save(new Bid(itemId, user, requestDto.getPrice()));
-
         itemRepository.updateItem(itemId, requestDto.getPrice());
     }
 
