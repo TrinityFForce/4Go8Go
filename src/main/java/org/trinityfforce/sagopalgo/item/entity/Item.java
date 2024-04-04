@@ -44,6 +44,9 @@ public class Item extends Timestamped {
     @Column(nullable = false)
     private Integer bidCount;
 
+    @Column(nullable = false)
+    private LocalDateTime startDate;
+
     @Column
     private LocalDateTime deadline;
 
@@ -58,27 +61,36 @@ public class Item extends Timestamped {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(nullable = false)
+    private ItemStatusEnum status;
+
     public Item(ItemRequest itemRequest, Category category, User user) {
         this.name = itemRequest.getName();
         this.startPrice = itemRequest.getStartPrice();
         this.bidUnit = itemRequest.getBidUnit();
+        this.startDate = itemRequest.getStartDate();
         this.bidCount = 0;
-        this.deadline = itemRequest.getDeadLine();
         this.highestPrice = itemRequest.getStartPrice();
         this.category = category;
         this.user = user;
+        this.status = ItemStatusEnum.PENDING;
     }
 
     public void update(ItemRequest itemRequest, Category category) {
         this.name = itemRequest.getName();
+        this.startDate = itemRequest.getStartDate();
         this.startPrice = itemRequest.getStartPrice();
         this.bidUnit = itemRequest.getBidUnit();
-        this.deadline = itemRequest.getDeadLine();
         this.highestPrice = itemRequest.getStartPrice();
         this.category = category;
     }
 
     public void updateBidItem(Integer price) {
         this.highestPrice = price;
+    }
+
+    public void start() { // 경매 시작 함수
+        this.deadline = this.startDate.plusDays(1);
+        this.status = ItemStatusEnum.INPROGRESS;
     }
 }

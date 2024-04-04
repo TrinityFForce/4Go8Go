@@ -59,7 +59,7 @@ public class ItemContoller {
     }
 
     @PutMapping("/{itemId}")
-    @Operation(summary = "상품 수정", description = "상품정보를 수정한다(입찰자가 없는경우).")
+    @Operation(summary = "상품 수정", description = "상품정보를 수정한다(경매가 시작되지 않은경우).")
     public ResponseEntity<ResultResponse> updateItem(@PathVariable Long itemId,
         @RequestBody ItemRequest itemRequest,
         @AuthenticationPrincipal UserDetailsImpl userDetails) throws BadRequestException {
@@ -68,7 +68,7 @@ public class ItemContoller {
     }
 
     @DeleteMapping("/{itemId}")
-    @Operation(summary = "상품 삭제", description = "상품을 삭제한다(입찰자가 없는경우).")
+    @Operation(summary = "상품 삭제", description = "상품을 삭제한다(경매가 시작되지 않은경우).")
     public ResponseEntity<ResultResponse> deleteItem(@PathVariable Long itemId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) throws BadRequestException {
         return ResponseEntity.ok(itemService.deleteItem(itemId, userDetails.getUser()));

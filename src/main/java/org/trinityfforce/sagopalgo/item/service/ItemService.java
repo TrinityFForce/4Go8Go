@@ -71,7 +71,7 @@ public class ItemService {
         Category category = getCategory(itemRequest.getCategory());
         User owner = getUser(user.getId());
         isAuthorized(item, owner.getId());
-        isBidding(item);
+        isUpdatable(item);
 
         item.update(itemRequest, category);
 
@@ -84,7 +84,7 @@ public class ItemService {
         Item item = getItem(itemId);
         User owner = getUser(user.getId());
         isAuthorized(item, owner.getId());
-        isBidding(item);
+        isUpdatable(item);
 
         itemRepository.deleteById(item.getId());
 
@@ -118,9 +118,9 @@ public class ItemService {
         }
     }
 
-    private void isBidding(Item item) throws BadRequestException {
-        if (item.getBidCount() > 0) {
-            throw new BadRequestException("해당 상품에 입찰자가 존재합니다.");
+    private void isUpdatable(Item item) throws BadRequestException {
+        if (item.getStatus().getLabel().equals("PENDING")) {
+            throw new BadRequestException("경매전 상품만 가능합니다.");
         }
     }
 
@@ -132,4 +132,6 @@ public class ItemService {
             item.updateBidItem(currentPrice);
         }
     }
+
+
 }

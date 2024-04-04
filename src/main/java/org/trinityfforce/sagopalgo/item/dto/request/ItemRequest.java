@@ -23,9 +23,9 @@ public class ItemRequest {
     @PositiveOrZero(message = "입찰단위는 0원 이거나 커야합니다.")
     private Integer bidUnit;
 
-    @NotNull(message = "경매 종료일은 필수 항목입니다.")
-    @Future(message = "경매 종료일은 미래여야 합니다.")
-    private LocalDateTime deadLine;
+    @NotNull(message = "경매 시작일은 필수 항목입니다.")
+    @Future(message = "경매 시작일은 미래여야 합니다.")
+    private LocalDateTime startDate;
 
     @NotBlank(message = "카테고리는 필수 항목입니다.")
     private String category;
