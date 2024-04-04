@@ -23,21 +23,23 @@ public class ItemResponse {
     private Integer bidUnit;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd kk:mm")
-    private LocalDateTime deadline;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDateTime startDate;
     private Integer highestPrice;
     private String category;
     private String username;
+    private String status;
 
     public ItemResponse(Item item) {
         this.id = item.getId();
         this.name = item.getName();
         this.startPrice = item.getStartPrice();
         this.bidCount = item.getBidCount();
-        this.deadline = item.getDeadline();
+        this.startDate = item.getDeadline();
         this.highestPrice = item.getHighestPrice();
         this.category = item.getCategory().getName();
         this.username = item.getUser().getUsername();
         this.bidUnit = item.getBidUnit();
+        this.status = item.getStatus().getLabel();
     }
 }
