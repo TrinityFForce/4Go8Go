@@ -15,6 +15,7 @@ import org.trinityfforce.sagopalgo.user.entity.User;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -63,6 +64,9 @@ public class BidService {
             Item item = itemRepository.findById(itemId).orElseThrow(
                     () -> new IllegalArgumentException("해당 ID를 가진 상품은 존재하지 않습니다.")
             );
+            if (!Objects.equals(item.getStatus().getLabel(), "INPROGRESS")) {
+                throw new IllegalArgumentException("경매중인 상품만 입찰이 가능합니다.");
+            }
             bidUnit = item.getBidUnit();
             minimum = item.getHighestPrice() + bidUnit;
         }
