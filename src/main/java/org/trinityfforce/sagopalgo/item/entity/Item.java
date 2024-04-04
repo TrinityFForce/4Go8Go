@@ -2,6 +2,8 @@ package org.trinityfforce.sagopalgo.item.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -62,6 +64,7 @@ public class Item extends Timestamped {
     private User user;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private ItemStatusEnum status;
 
     public Item(ItemRequest itemRequest, Category category, User user) {
