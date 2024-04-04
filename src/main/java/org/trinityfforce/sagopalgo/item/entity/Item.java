@@ -68,6 +68,7 @@ public class Item extends Timestamped {
         this.name = itemRequest.getName();
         this.startPrice = itemRequest.getStartPrice();
         this.bidUnit = itemRequest.getBidUnit();
+        this.startDate = itemRequest.getStartDate();
         this.bidCount = 0;
         this.highestPrice = itemRequest.getStartPrice();
         this.category = category;
