@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.trinityfforce.sagopalgo.bid.dto.BidRequestDto;
 import org.trinityfforce.sagopalgo.bid.dto.BidResponseDto;
+import org.trinityfforce.sagopalgo.bid.dto.ItemPriceUpdate;
 import org.trinityfforce.sagopalgo.bid.entity.Bid;
 import org.trinityfforce.sagopalgo.bid.repository.BidRepository;
 import org.trinityfforce.sagopalgo.item.entity.Item;
@@ -55,6 +56,8 @@ public class BidService {
         } else if (ttl != null){
             hashMapRedisTemplate.opsForValue().set(itemKey, bidInfo, ttl, TimeUnit.SECONDS);
         }
+
+        hashMapRedisTemplate.convertAndSend("itemPriceUpdate", new ItemPriceUpdate(itemId, requestDto.getPrice()));
 
         bidRepository.save(new Bid(itemId, user, requestDto.getPrice()));
         itemRepository.updateItem(itemId, requestDto.getPrice());

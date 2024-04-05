@@ -59,7 +59,6 @@ public class ItemService {
     @Transactional(readOnly = true)
     public ItemResponse getItemById(Long itemId) throws BadRequestException {
         Item item = getItem(itemId);
-        cacheCheck(item);
         return new ItemResponse(item);
     }
 
@@ -123,15 +122,4 @@ public class ItemService {
             throw new BadRequestException("경매전 상품만 가능합니다.");
         }
     }
-
-    private void cacheCheck(Item item) {
-        String itemKey = "Item:" + item.getId();
-        HashMap<String, Object> bidInfo = hashMapRedisTemplate.opsForValue().get(itemKey);
-        if (bidInfo != null) {
-            Integer currentPrice = (Integer) bidInfo.get("price");
-            item.updateBidItem(currentPrice);
-        }
-    }
-
-
 }
