@@ -1,5 +1,6 @@
 package org.trinityfforce.sagopalgo.item.service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,12 +8,16 @@ import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.trinityfforce.sagopalgo.category.entity.Category;
 import org.trinityfforce.sagopalgo.category.repository.CategoryRepository;
 import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
+import org.trinityfforce.sagopalgo.item.dto.request.OptionRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 import org.trinityfforce.sagopalgo.item.dto.response.ResultResponse;
@@ -42,24 +47,26 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "item", key = "#root.methodName", cacheManager = "cacheManager", unless = "#result == null")
-    public List<ItemResponse> getItem() {
-        List<Item> itemList = itemRepository.findAll();
-
+    @Cacheable(value = "item", cacheManager = "cacheManager", unless = "#result == null")
+    public List<ItemResponse> getItem(LocalDate date, String condition) {
+        List<Item> itemList = itemRepository.getItem(date, condition); // 조회 condition으로 찾아온 상품
         return itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "item", key = "#searchRequest", cacheManager = "cacheManager", unless = "#result == null")
-    public List<ItemResponse> searchItem(SearchRequest searchRequest) {
-        List<Item> itemList = itemRepository.searchItem(searchRequest);
-        return itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList());
+    public Page<ItemResponse> pageItem(SearchRequest searchRequest, OptionRequest optionRequest) {
+        String option = optionRequest.getOption();
+        Sort.Direction direction = optionRequest.isASC() ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, option);
+        PageRequest pageable = PageRequest.of(optionRequest.getPage(), optionRequest.getSize(),
+            sort);
+        return itemRepository.pageItem(searchRequest, pageable);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public ItemResponse getItemById(Long itemId) throws BadRequestException {
         Item item = getItem(itemId);
-        cacheCheck(item);
+        item.addViewCount();
         return new ItemResponse(item);
     }
 

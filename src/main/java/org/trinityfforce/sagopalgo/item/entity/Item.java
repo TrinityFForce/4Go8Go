@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -47,13 +48,19 @@ public class Item extends Timestamped {
     private Integer bidCount;
 
     @Column(nullable = false)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column
-    private LocalDateTime deadline;
+    private LocalDate deadline;
+
+    @Column
+    private String url;
 
     @Column
     private Integer highestPrice;
+
+    @Column
+    private Integer viewCount;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -73,6 +80,7 @@ public class Item extends Timestamped {
         this.bidUnit = itemRequest.getBidUnit();
         this.startDate = itemRequest.getStartDate();
         this.bidCount = 0;
+        this.viewCount = 0;
         this.highestPrice = itemRequest.getStartPrice();
         this.category = category;
         this.user = user;
@@ -92,8 +100,7 @@ public class Item extends Timestamped {
         this.highestPrice = price;
     }
 
-    public void start() { // 경매 시작 함수
-        this.deadline = this.startDate.plusDays(1);
-        this.status = ItemStatusEnum.INPROGRESS;
+    public void addViewCount(){
+        this.viewCount++;
     }
 }

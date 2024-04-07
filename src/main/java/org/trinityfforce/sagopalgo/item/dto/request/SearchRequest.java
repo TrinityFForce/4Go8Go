@@ -11,5 +11,5 @@ public class SearchRequest {
 
     private String name;
     private String category;
-
+    private String status;
 }

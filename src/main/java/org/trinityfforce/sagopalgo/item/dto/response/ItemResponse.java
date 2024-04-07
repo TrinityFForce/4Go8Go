@@ -1,6 +1,5 @@
 package org.trinityfforce.sagopalgo.item.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -23,23 +22,30 @@ public class ItemResponse {
     private Integer bidUnit;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime startDate;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime deadline;
     private Integer highestPrice;
     private String category;
     private String username;
     private String status;
+    private Integer viewCount;
+    private String url;
 
     public ItemResponse(Item item) {
         this.id = item.getId();
         this.name = item.getName();
         this.startPrice = item.getStartPrice();
         this.bidCount = item.getBidCount();
-        this.startDate = item.getDeadline();
+        this.startDate = item.getStartDate().atStartOfDay().plusHours(9);
+        this.deadline = item.getStartDate().atStartOfDay().plusHours(18);
         this.highestPrice = item.getHighestPrice();
         this.category = item.getCategory().getName();
         this.username = item.getUser().getUsername();
         this.bidUnit = item.getBidUnit();
         this.status = item.getStatus().getLabel();
+        this.viewCount = item.getViewCount();
+        this.url = item.getUrl();
     }
 }

@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -25,7 +25,7 @@ public class ItemRequest {
 
     @NotNull(message = "경매 시작일은 필수 항목입니다.")
     @Future(message = "경매 시작일은 미래여야 합니다.")
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @NotBlank(message = "카테고리는 필수 항목입니다.")
     private String category;

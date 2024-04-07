@@ -4,12 +4,13 @@ public enum ItemStatusEnum {
     PENDING("PENDING"), INPROGRESS("INPROGRESS"), COMPLETED("COMPLETED");
     private final String label;
 
-    ItemStatusEnum(String label){
+    ItemStatusEnum(String label) {
         this.label = label;
     }
 
-    public String getLabel(){
+    public String getLabel() {
         return label;
     }
+
 
 }

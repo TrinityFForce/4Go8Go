@@ -4,13 +4,16 @@ package org.trinityfforce.sagopalgo.item.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.trinityfforce.sagopalgo.global.security.UserDetailsImpl;
 import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
+import org.trinityfforce.sagopalgo.item.dto.request.OptionRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 import org.trinityfforce.sagopalgo.item.dto.response.ResultResponse;
@@ -40,15 +44,26 @@ public class ItemContoller {
     }
 
     @GetMapping
-    @Operation(summary = "상품 목록 조회", description = "전체 상품 목록을 조회한다.")
+    @Operation(summary = "추천 목록 조회(시간대)", description = "시간대에 따라 추천 목록을 조회한다.")
     public ResponseEntity<List<ItemResponse>> getItem() {
-        return ResponseEntity.ok(itemService.getItem());
+        LocalDateTime time = LocalDateTime.now();
+        String condition;   //  조회 condition
+        if (time.getHour() < 9) {
+            condition = "before";
+        } else if (time.getHour() < 18) {
+            condition = "progress";
+        } else {
+            condition = "after";
+        }
+        return ResponseEntity.ok(itemService.getItem(time.toLocalDate(), condition));
     }
 
     @GetMapping("/search")
-    @Operation(summary = "상품 검색", description = "검색어를 통해 상품을 조회한다.")
-    public ResponseEntity<List<ItemResponse>> searchItem(@RequestBody SearchRequest searchRequest) {
-        return ResponseEntity.ok(itemService.searchItem(searchRequest));
+    @Operation(summary = "상품 검색", description = "상품을 검색한다.")
+    public ResponseEntity<Page<ItemResponse>> pageItem(@RequestBody SearchRequest searchRequest,
+        @ModelAttribute
+        OptionRequest optionRequest) {
+        return ResponseEntity.ok(itemService.pageItem(searchRequest, optionRequest));
     }
 
     @GetMapping("/{itemId}")
