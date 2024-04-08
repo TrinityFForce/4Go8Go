@@ -54,6 +54,12 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
+    public List<ItemResponse> getSales(User user) {
+        List<Item> itemList = itemRepository.findAllByUserId(user.getId());
+        return itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public Page<ItemResponse> pageItem(SearchRequest searchRequest, OptionRequest optionRequest) {
         String option = optionRequest.getOption();
         Sort.Direction direction = optionRequest.isASC() ? Sort.Direction.ASC : Sort.Direction.DESC;
@@ -130,6 +136,7 @@ public class ItemService {
             throw new BadRequestException("경매전 상품만 가능합니다.");
         }
     }
+
 
 
 }

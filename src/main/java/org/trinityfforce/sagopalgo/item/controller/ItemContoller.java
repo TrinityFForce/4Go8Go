@@ -89,5 +89,10 @@ public class ItemContoller {
         return ResponseEntity.ok(itemService.deleteItem(itemId, userDetails.getUser()));
     }
 
+    @GetMapping("/sales")
+    @Operation(summary = "판매 목록 조회", description = "사용자의 판매 목록을 조회한다.")
+    public ResponseEntity<List<ItemResponse>> getSales(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        return ResponseEntity.ok(itemService.getSales(userDetails.getUser()));
+    }
 
 }
