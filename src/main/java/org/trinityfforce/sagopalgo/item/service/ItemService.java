@@ -131,14 +131,5 @@ public class ItemService {
         }
     }
 
-    private void cacheCheck(Item item) {
-        String itemKey = "Item:" + item.getId();
-        HashMap<String, Object> bidInfo = hashMapRedisTemplate.opsForValue().get(itemKey);
-        if (bidInfo != null) {
-            Integer currentPrice = (Integer) bidInfo.get("price");
-            item.updateBidItem(currentPrice);
-        }
-    }
-
 
 }
