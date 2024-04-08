@@ -85,6 +85,7 @@ public class Item extends Timestamped {
         this.category = category;
         this.user = user;
         this.status = ItemStatusEnum.PENDING;
+        this.url = itemRequest.getUrl();
     }
 
     public void update(ItemRequest itemRequest, Category category) {
@@ -94,10 +95,7 @@ public class Item extends Timestamped {
         this.bidUnit = itemRequest.getBidUnit();
         this.highestPrice = itemRequest.getStartPrice();
         this.category = category;
-    }
-
-    public void updateBidItem(Integer price) {
-        this.highestPrice = price;
+        this.url = itemRequest.getUrl();
     }
 
     public void addViewCount(){
