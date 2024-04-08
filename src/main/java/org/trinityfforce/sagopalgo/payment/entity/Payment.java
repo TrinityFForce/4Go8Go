@@ -8,11 +8,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.trinityfforce.sagopalgo.item.entity.Item;
+import org.trinityfforce.sagopalgo.payment.dto.response.TossPayment;
 import org.trinityfforce.sagopalgo.user.entity.User;
 
 @Entity
@@ -41,15 +41,33 @@ public class Payment {
     private boolean isPaid;
 
     @Column
-    private LocalDateTime paymentTime;
+    private String paidAt;
 
     @Column
-    private String paymentMethod;
+    private String method;
 
-    public Payment(User user, Item item, Integer price){
+    @Column
+    private String orderId;
+
+    @Column
+    private String provider;
+
+    @Column
+    private String receipt;
+
+    public Payment(User user, Item item, Integer price) {    //lambda가 경매종료 상태로 변경할때 함께 저장
         this.user = user;
         this.item = item;
         this.price = price;
         this.isPaid = false;
+    }
+
+    public void update(TossPayment tossPayment) {
+        this.paidAt = tossPayment.getApprovedAt();
+        this.method = tossPayment.getMethod();
+        this.orderId = tossPayment.getOrderId();
+        this.provider = tossPayment.getEasyPay().getProvider();
+        this.receipt = tossPayment.getReceipt().getUrl();
+        this.isPaid = true;
     }
 }
