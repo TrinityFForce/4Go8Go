@@ -19,9 +19,7 @@ public class Bid extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
-    private Item item;
+    private Long itemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -29,8 +27,8 @@ public class Bid extends Timestamped {
 
     private Integer price;
 
-    public Bid(Item item, User user, Integer price) {
-        this.item = item;
+    public Bid(Long itemId, User user, Integer price) {
+        this.itemId = itemId;
         this.user = user;
         this.price = price;
     }
