@@ -11,7 +11,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -49,9 +48,6 @@ public class Item extends Timestamped {
 
     @Column(nullable = false)
     private LocalDate startDate;
-
-    @Column
-    private LocalDate deadline;
 
     @Column
     private String url;
@@ -98,7 +94,7 @@ public class Item extends Timestamped {
         this.url = itemRequest.getUrl();
     }
 
-    public void addViewCount(){
+    public void addViewCount() {
         this.viewCount++;
     }
 }

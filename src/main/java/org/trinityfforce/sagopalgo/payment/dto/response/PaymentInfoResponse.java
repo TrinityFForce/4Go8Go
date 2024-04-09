@@ -19,6 +19,7 @@ public class PaymentInfoResponse {
     private String method;
     private String orderId;
     private String provider;
+    private String receipt;
 
     public PaymentInfoResponse(Payment payment) {
         this.itemId = payment.getId();
@@ -30,5 +31,6 @@ public class PaymentInfoResponse {
         this.method = payment.getMethod();
         this.orderId = payment.getOrderId();
         this.provider = payment.getProvider();
+        this.receipt = payment.getReceipt();
     }
 }
