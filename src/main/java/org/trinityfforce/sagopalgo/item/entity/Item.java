@@ -19,6 +19,7 @@ import org.hibernate.annotations.Where;
 import org.trinityfforce.sagopalgo.category.entity.Category;
 import org.trinityfforce.sagopalgo.global.common.Timestamped;
 import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
+import org.trinityfforce.sagopalgo.item.dto.request.RelistRequest;
 import org.trinityfforce.sagopalgo.user.entity.User;
 
 @Entity
@@ -96,5 +97,10 @@ public class Item extends Timestamped {
 
     public void addViewCount() {
         this.viewCount++;
+    }
+
+    public void relist(RelistRequest relistRequest) {
+        this.status = ItemStatusEnum.PENDING;
+        this.startDate = relistRequest.getStartDate();
     }
 }

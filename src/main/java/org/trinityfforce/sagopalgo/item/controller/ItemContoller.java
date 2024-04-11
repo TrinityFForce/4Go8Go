@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.trinityfforce.sagopalgo.global.security.UserDetailsImpl;
 import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.OptionRequest;
+import org.trinityfforce.sagopalgo.item.dto.request.RelistRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 import org.trinityfforce.sagopalgo.item.dto.response.ResultResponse;
@@ -76,10 +77,19 @@ public class ItemContoller {
     @PutMapping("/{itemId}")
     @Operation(summary = "상품 수정", description = "상품정보를 수정한다(경매가 시작되지 않은경우).")
     public ResponseEntity<ResultResponse> updateItem(@PathVariable Long itemId,
-        @RequestBody ItemRequest itemRequest,
+        @Valid @RequestBody ItemRequest itemRequest,
         @AuthenticationPrincipal UserDetailsImpl userDetails) throws BadRequestException {
         return ResponseEntity.ok(
             itemService.updateItem(itemId, itemRequest, userDetails.getUser()));
+    }
+
+    @PostMapping("/{itemId}")
+    @Operation(summary = "상품 재등록", description = "유찰된 상품을 재등록 한다.")
+    public ResponseEntity<ResultResponse> relistItem(@PathVariable Long itemId, @Valid @RequestBody
+    RelistRequest relistRequest, @AuthenticationPrincipal UserDetailsImpl userDetails)
+        throws BadRequestException {
+        return ResponseEntity.ok(
+            itemService.relistItem(itemId, relistRequest, userDetails.getUser()));
     }
 
     @DeleteMapping("/{itemId}")
@@ -91,8 +101,10 @@ public class ItemContoller {
 
     @GetMapping("/sales")
     @Operation(summary = "판매 목록 조회", description = "사용자의 판매 목록을 조회한다.")
-    public ResponseEntity<List<ItemResponse>> getSales(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<List<ItemResponse>> getSales(
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(itemService.getSales(userDetails.getUser()));
     }
+
 
 }

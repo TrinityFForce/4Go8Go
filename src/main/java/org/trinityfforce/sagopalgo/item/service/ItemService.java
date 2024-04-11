@@ -18,6 +18,7 @@ import org.trinityfforce.sagopalgo.category.entity.Category;
 import org.trinityfforce.sagopalgo.category.repository.CategoryRepository;
 import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.OptionRequest;
+import org.trinityfforce.sagopalgo.item.dto.request.RelistRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 import org.trinityfforce.sagopalgo.item.dto.response.ResultResponse;
@@ -70,6 +71,7 @@ public class ItemService {
     }
 
     @Transactional
+    @CacheEvict(value = "item", allEntries = true)
     public ItemResponse getItemById(Long itemId) throws BadRequestException {
         Item item = getItem(itemId);
         item.addViewCount();
@@ -89,6 +91,20 @@ public class ItemService {
         item.update(itemRequest, category);
 
         return new ResultResponse(200, "OK", "수정되었습니다.");
+    }
+
+    @Transactional
+    @CacheEvict(value = "item", allEntries = true)
+    public ResultResponse relistItem(Long itemId, RelistRequest relistRequest, User user)
+        throws BadRequestException {
+        Item item = getItem(itemId);
+        User owner = getUser(user.getId());
+        isAuthorized(item, owner.getId());
+        isRelistable(item);
+
+        item.relist(relistRequest);
+
+        return new ResultResponse(200, "OK", "재등록 되었습니다.");
     }
 
     @Transactional
@@ -132,11 +148,19 @@ public class ItemService {
     }
 
     private void isUpdatable(Item item) throws BadRequestException {
-        if (item.getStatus().getLabel().equals("PENDING")) {
+        if (!item.getStatus().getLabel().equals("PENDING")) {
             throw new BadRequestException("경매전 상품만 가능합니다.");
         }
     }
 
+    private void isRelistable(Item item) throws BadRequestException {
+        if (item.getBidCount() != 0) {
+            throw new BadRequestException("유찰된 상품만 가능합니다.");
+        }
+        if (!item.getStatus().getLabel().equals("COMPLETED")) {
+            throw new BadRequestException("경매가 끝난 상품만 가능합니다.");
+        }
+    }
 
 
 }
