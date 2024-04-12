@@ -1,6 +1,7 @@
 package org.trinityfforce.sagopalgo.bid.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,8 @@ public class BidService {
     @Transactional
 //    @WithDistributedLock(lockName = "#itemId")
     @CacheEvict(value = "item", allEntries = true)
-    public void placeBid(Long itemId, User user, BidRequestDto requestDto) {
+    public void placeBid(Long itemId, User user, BidRequestDto requestDto)
+        throws BadRequestException {
         String itemKey = "Item:" + itemId;
         Integer bidUnit = checkPrice(itemKey, itemId, requestDto.getPrice());
 
@@ -63,7 +65,8 @@ public class BidService {
         itemRepository.updateItem(itemId, requestDto.getPrice());
     }
 
-    private Integer checkPrice(String itemKey, Long itemId, Integer price) {
+    private Integer checkPrice(String itemKey, Long itemId, Integer price)
+        throws BadRequestException {
         HashMap<String, Object> oldBidInfo = hashMapRedisTemplate.opsForValue().get(itemKey);
         int minimum;
         Integer bidUnit;
@@ -72,16 +75,16 @@ public class BidService {
             minimum = (Integer) oldBidInfo.get("price") + bidUnit;
         } else {
             Item item = itemRepository.findById(itemId).orElseThrow(
-                    () -> new IllegalArgumentException("해당 ID를 가진 상품은 존재하지 않습니다.")
+                    () -> new BadRequestException("해당 ID를 가진 상품은 존재하지 않습니다.")
             );
             if (!Objects.equals(item.getStatus().getLabel(), "INPROGRESS")) {
-                throw new IllegalArgumentException("경매중인 상품만 입찰이 가능합니다.");
+                throw new BadRequestException("경매중인 상품만 입찰이 가능합니다.");
             }
             bidUnit = item.getBidUnit();
             minimum = item.getHighestPrice() + bidUnit;
         }
         if (minimum > price) {
-            throw new IllegalArgumentException("입찰가는 " + minimum + "원 이상이어야 합니다.");
+            throw new BadRequestException("입찰가는 " + minimum + "원 이상이어야 합니다.");
         }
         return bidUnit;
     }

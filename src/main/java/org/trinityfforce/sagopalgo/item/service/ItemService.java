@@ -39,7 +39,8 @@ public class ItemService {
 
     @Transactional
     @CacheEvict(value = "item", allEntries = true)
-    public ResultResponse createItem(ItemRequest itemRequest, User user) {
+    public ResultResponse createItem(ItemRequest itemRequest, User user)
+        throws BadRequestException {
         Category category = getCategory(itemRequest.getCategory());
         User owner = getUser(user.getId());
 
@@ -120,16 +121,16 @@ public class ItemService {
         return new ResultResponse(200, "OK", "삭제되었습니다.");
     }
 
-    private User getUser(Long userId) {
+    private User getUser(Long userId) throws BadRequestException {
         User user = userRepository.findById(userId).orElseThrow(
-            () -> new NullPointerException("해당 유저가 존재하지 않습니다.")
+            () -> new BadRequestException("해당 유저가 존재하지 않습니다.")
         );
         return user;
     }
 
-    private Category getCategory(String name) {
+    private Category getCategory(String name) throws BadRequestException {
         Category category = categoryRepository.findByName(name).orElseThrow(
-            () -> new NullPointerException("해당 카테고리가 존재하지 않습니다.")
+            () -> new BadRequestException("해당 카테고리가 존재하지 않습니다.")
         );
         return category;
     }

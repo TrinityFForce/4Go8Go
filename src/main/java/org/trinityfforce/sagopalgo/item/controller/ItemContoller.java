@@ -40,7 +40,7 @@ public class ItemContoller {
     @PostMapping
     @Operation(summary = "상품 등록", description = "상품을 등록한다.")
     public ResponseEntity<ResultResponse> createItem(@Valid @RequestBody ItemRequest itemRequest,
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        @AuthenticationPrincipal UserDetailsImpl userDetails) throws BadRequestException {
         return ResponseEntity.ok(itemService.createItem(itemRequest, userDetails.getUser()));
     }
 

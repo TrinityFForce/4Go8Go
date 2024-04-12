@@ -56,9 +56,9 @@ public class TossService {
         return new PaymentResponse(payment);
     }
 
-    private Payment getPayment(Long pamentId) {
+    private Payment getPayment(Long pamentId) throws BadRequestException {
         return paymentRepository.findById(pamentId).orElseThrow(
-            () -> new NullPointerException("해당 결제정보가 존재하지 않습니다.")
+            () -> new BadRequestException("해당 결제정보가 존재하지 않습니다.")
         );
     }
 
