@@ -2,13 +2,15 @@ package org.trinityfforce.sagopalgo.item.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +19,7 @@ import org.hibernate.annotations.Where;
 import org.trinityfforce.sagopalgo.category.entity.Category;
 import org.trinityfforce.sagopalgo.global.common.Timestamped;
 import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
+import org.trinityfforce.sagopalgo.item.dto.request.RelistRequest;
 import org.trinityfforce.sagopalgo.user.entity.User;
 
 @Entity
@@ -45,13 +48,16 @@ public class Item extends Timestamped {
     private Integer bidCount;
 
     @Column(nullable = false)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column
-    private LocalDateTime deadline;
+    private String url;
 
     @Column
     private Integer highestPrice;
+
+    @Column
+    private Integer viewCount;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -62,6 +68,7 @@ public class Item extends Timestamped {
     private User user;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private ItemStatusEnum status;
 
     public Item(ItemRequest itemRequest, Category category, User user) {
@@ -70,10 +77,12 @@ public class Item extends Timestamped {
         this.bidUnit = itemRequest.getBidUnit();
         this.startDate = itemRequest.getStartDate();
         this.bidCount = 0;
+        this.viewCount = 0;
         this.highestPrice = itemRequest.getStartPrice();
         this.category = category;
         this.user = user;
         this.status = ItemStatusEnum.PENDING;
+        this.url = itemRequest.getUrl();
     }
 
     public void update(ItemRequest itemRequest, Category category) {
@@ -83,14 +92,15 @@ public class Item extends Timestamped {
         this.bidUnit = itemRequest.getBidUnit();
         this.highestPrice = itemRequest.getStartPrice();
         this.category = category;
+        this.url = itemRequest.getUrl();
     }
 
-    public void updateBidItem(Integer price) {
-        this.highestPrice = price;
+    public void addViewCount() {
+        this.viewCount++;
     }
 
-    public void start() { // 경매 시작 함수
-        this.deadline = this.startDate.plusDays(1);
-        this.status = ItemStatusEnum.INPROGRESS;
+    public void relist(RelistRequest relistRequest) {
+        this.status = ItemStatusEnum.PENDING;
+        this.startDate = relistRequest.getStartDate();
     }
 }

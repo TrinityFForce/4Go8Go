@@ -1,4 +1,4 @@
-package org.trinityfforce.sagopalgo.user.Controller;
+package org.trinityfforce.sagopalgo.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;

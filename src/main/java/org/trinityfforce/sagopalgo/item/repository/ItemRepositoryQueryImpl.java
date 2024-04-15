@@ -1,12 +1,23 @@
 package org.trinityfforce.sagopalgo.item.repository;
 
+import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
+import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 import org.trinityfforce.sagopalgo.item.entity.Item;
+import org.trinityfforce.sagopalgo.item.entity.ItemStatusEnum;
 import org.trinityfforce.sagopalgo.item.entity.QItem;
 
 @RequiredArgsConstructor
@@ -17,21 +28,76 @@ public class ItemRepositoryQueryImpl implements ItemRepositoryQuery {
 
     @Override
     @Transactional
-    public List<Item> searchItem(SearchRequest searchRequest) {
-        return jpaQueryFactory
+    public Page<ItemResponse> pageItem(SearchRequest searchRequest, Pageable pageable) {
+        QueryResults<Item> queryResults = jpaQueryFactory
             .selectFrom(qItem)
             .where(eqName(searchRequest.getName()),
-                eqCategory(searchRequest.getCategory()))
+                eqCategory(searchRequest.getCategory()),
+                eqStatus(searchRequest.getStatus()))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .orderBy(itemSort(pageable))
+            .fetchResults();
+        List<Item> content = queryResults.getResults();
+        List<ItemResponse> itemResponseList = content.stream().map(item -> new ItemResponse(item))
+            .collect(
+                Collectors.toList());
+        Long total = queryResults.getTotal();
+        return new PageImpl<>(itemResponseList, pageable, total);
+    }
+
+    @Override
+    @Transactional
+    public List<Item> getItem(LocalDate date, String condition) {
+        return jpaQueryFactory
+            .selectFrom(qItem)
+            .where(eqCondition(condition),
+                qItem.startDate.eq(date))
             .fetch();
     }
 
-    public BooleanExpression eqName(String itemName) {
+    private BooleanExpression eqCondition(String condition) {
+        switch (condition) {
+            case "before":
+                return qItem.status.eq(ItemStatusEnum.PENDING);
+
+            case "progress":
+                return qItem.status.eq(ItemStatusEnum.INPROGRESS);
+
+            case "after":
+                return qItem.status.eq(ItemStatusEnum.COMPLETED);
+        }
+        return null;
+    }
+
+    private BooleanExpression eqName(String itemName) {
         return itemName != null ? qItem.name.like(itemName + "%") : null;
     }
 
-    public BooleanExpression eqCategory(String category) {
-        return category != null ? qItem.category.name.like(category) : null;
+    private BooleanExpression eqCategory(String category) {
+        return category != null ? qItem.category.name.like(category + "%") : null;
     }
 
+    private BooleanExpression eqStatus(String status) {
+        return status != null ? qItem.status.eq(ItemStatusEnum.valueOf(status)) : null;
+    }
+
+    private OrderSpecifier<?> itemSort(Pageable pageable) {
+        if (!pageable.getSort().isEmpty()) {
+            Sort.Order order = pageable.getSort().iterator().next();
+            Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
+            switch (order.getProperty()) {
+                case "bidCount":
+                    return new OrderSpecifier(direction, qItem.bidCount);
+
+                case "highestPrice":
+                    return new OrderSpecifier(direction, qItem.highestPrice);
+
+                default:
+                    return new OrderSpecifier(direction, qItem.viewCount);
+            }
+        }
+        return null;
+    }
 
 }

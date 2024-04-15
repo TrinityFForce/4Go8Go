@@ -1,6 +1,7 @@
 package org.trinityfforce.sagopalgo.bid.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,8 @@ public class BidController {
     @PostMapping("/items/{itemId}/bid")
     public ResponseEntity<CommonResponseDto> placeBid(@PathVariable Long itemId,
                                                       @RequestBody BidRequestDto requestDto,
-                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                      @AuthenticationPrincipal UserDetailsImpl userDetails)
+        throws BadRequestException {
         bidService.placeBid(itemId, userDetails.getUser(), requestDto);
         return ResponseEntity.status(201).body(new CommonResponseDto("입찰 성공", 201));
     }

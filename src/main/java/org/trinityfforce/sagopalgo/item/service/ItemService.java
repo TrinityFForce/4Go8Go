@@ -1,5 +1,6 @@
 package org.trinityfforce.sagopalgo.item.service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,12 +8,17 @@ import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.trinityfforce.sagopalgo.category.entity.Category;
 import org.trinityfforce.sagopalgo.category.repository.CategoryRepository;
 import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
+import org.trinityfforce.sagopalgo.item.dto.request.OptionRequest;
+import org.trinityfforce.sagopalgo.item.dto.request.RelistRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 import org.trinityfforce.sagopalgo.item.dto.response.ResultResponse;
@@ -33,7 +39,8 @@ public class ItemService {
 
     @Transactional
     @CacheEvict(value = "item", allEntries = true)
-    public ResultResponse createItem(ItemRequest itemRequest, User user) {
+    public ResultResponse createItem(ItemRequest itemRequest, User user)
+        throws BadRequestException {
         Category category = getCategory(itemRequest.getCategory());
         User owner = getUser(user.getId());
 
@@ -42,24 +49,33 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "item", key = "#root.methodName", cacheManager = "cacheManager", unless = "#result == null")
-    public List<ItemResponse> getItem() {
-        List<Item> itemList = itemRepository.findAll();
-
+    @Cacheable(value = "item", cacheManager = "cacheManager", unless = "#result == null")
+    public List<ItemResponse> getItem(LocalDate date, String condition) {
+        List<Item> itemList = itemRepository.getItem(date, condition); // 조회 condition으로 찾아온 상품
         return itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "item", key = "#searchRequest", cacheManager = "cacheManager", unless = "#result == null")
-    public List<ItemResponse> searchItem(SearchRequest searchRequest) {
-        List<Item> itemList = itemRepository.searchItem(searchRequest);
+    public List<ItemResponse> getSales(User user) {
+        List<Item> itemList = itemRepository.findAllByUserId(user.getId());
         return itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
+    public Page<ItemResponse> pageItem(SearchRequest searchRequest, OptionRequest optionRequest) {
+        String option = optionRequest.getOption();
+        Sort.Direction direction = optionRequest.isASC() ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, option);
+        PageRequest pageable = PageRequest.of(optionRequest.getPage(), optionRequest.getSize(),
+            sort);
+        return itemRepository.pageItem(searchRequest, pageable);
+    }
+
+    @Transactional
+    @CacheEvict(value = "item", allEntries = true)
     public ItemResponse getItemById(Long itemId) throws BadRequestException {
         Item item = getItem(itemId);
-        cacheCheck(item);
+        item.addViewCount();
         return new ItemResponse(item);
     }
 
@@ -80,6 +96,20 @@ public class ItemService {
 
     @Transactional
     @CacheEvict(value = "item", allEntries = true)
+    public ResultResponse relistItem(Long itemId, RelistRequest relistRequest, User user)
+        throws BadRequestException {
+        Item item = getItem(itemId);
+        User owner = getUser(user.getId());
+        isAuthorized(item, owner.getId());
+        isRelistable(item);
+
+        item.relist(relistRequest);
+
+        return new ResultResponse(200, "OK", "재등록 되었습니다.");
+    }
+
+    @Transactional
+    @CacheEvict(value = "item", allEntries = true)
     public ResultResponse deleteItem(Long itemId, User user) throws BadRequestException {
         Item item = getItem(itemId);
         User owner = getUser(user.getId());
@@ -91,16 +121,16 @@ public class ItemService {
         return new ResultResponse(200, "OK", "삭제되었습니다.");
     }
 
-    private User getUser(Long userId) {
+    private User getUser(Long userId) throws BadRequestException {
         User user = userRepository.findById(userId).orElseThrow(
-            () -> new NullPointerException("해당 유저가 존재하지 않습니다.")
+            () -> new BadRequestException("해당 유저가 존재하지 않습니다.")
         );
         return user;
     }
 
-    private Category getCategory(String name) {
+    private Category getCategory(String name) throws BadRequestException {
         Category category = categoryRepository.findByName(name).orElseThrow(
-            () -> new NullPointerException("해당 카테고리가 존재하지 않습니다.")
+            () -> new BadRequestException("해당 카테고리가 존재하지 않습니다.")
         );
         return category;
     }
@@ -119,17 +149,17 @@ public class ItemService {
     }
 
     private void isUpdatable(Item item) throws BadRequestException {
-        if (item.getStatus().getLabel().equals("PENDING")) {
+        if (!item.getStatus().getLabel().equals("PENDING")) {
             throw new BadRequestException("경매전 상품만 가능합니다.");
         }
     }
 
-    private void cacheCheck(Item item) {
-        String itemKey = "Item:" + item.getId();
-        HashMap<String, Object> bidInfo = hashMapRedisTemplate.opsForValue().get(itemKey);
-        if (bidInfo != null) {
-            Integer currentPrice = (Integer) bidInfo.get("price");
-            item.updateBidItem(currentPrice);
+    private void isRelistable(Item item) throws BadRequestException {
+        if (item.getBidCount() != 0) {
+            throw new BadRequestException("유찰된 상품만 가능합니다.");
+        }
+        if (!item.getStatus().getLabel().equals("COMPLETED")) {
+            throw new BadRequestException("경매가 끝난 상품만 가능합니다.");
         }
     }
 
