@@ -10,16 +10,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
-import org.trinityfforce.sagopalgo.item.dto.response.ItemInfoResponse;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 import org.trinityfforce.sagopalgo.item.entity.Item;
 import org.trinityfforce.sagopalgo.item.entity.ItemStatusEnum;
 import org.trinityfforce.sagopalgo.item.entity.QItem;
+import org.trinityfforce.sagopalgo.item.entity.RestPage;
 
 @RequiredArgsConstructor
 public class ItemRepositoryQueryImpl implements ItemRepositoryQuery {
@@ -44,7 +43,8 @@ public class ItemRepositoryQueryImpl implements ItemRepositoryQuery {
             .collect(
                 Collectors.toList());
         Long total = queryResults.getTotal();
-        return new PageImpl<>(itemResponseList, pageable, total);
+        return new RestPage<>(itemResponseList, pageable.getPageNumber(), pageable.getPageSize(),
+            total);
     }
 
     @Override
@@ -88,17 +88,17 @@ public class ItemRepositoryQueryImpl implements ItemRepositoryQuery {
             Sort.Order order = pageable.getSort().iterator().next();
             Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
             switch (order.getProperty()) {
-                case "bidCount":
+                case "bidcount":
                     return new OrderSpecifier(direction, qItem.bidCount);
 
-                case "highestPrice":
+                case "highestprice":
                     return new OrderSpecifier(direction, qItem.highestPrice);
 
-                default:
+                case "viewcount":
                     return new OrderSpecifier(direction, qItem.viewCount);
             }
         }
-        return null;
+        return new OrderSpecifier(Order.DESC, qItem.viewCount);
     }
 
 }

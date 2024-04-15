@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.trinityfforce.sagopalgo.global.security.UserDetailsImpl;
 import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
-import org.trinityfforce.sagopalgo.item.dto.request.OptionRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.RelistRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemInfoResponse;
@@ -62,10 +62,11 @@ public class ItemContoller {
 
     @GetMapping("/search")
     @Operation(summary = "상품 검색", description = "상품을 검색한다.")
-    public ResponseEntity<Page<ItemResponse>> pageItem(@RequestBody SearchRequest searchRequest,
+    public ResponseEntity<Page<ItemResponse>> pageItem(
         @ModelAttribute
-        OptionRequest optionRequest) {
-        return ResponseEntity.ok(itemService.pageItem(searchRequest, optionRequest));
+        SearchRequest searchRequest,
+        Pageable pageable) {
+        return ResponseEntity.ok(itemService.pageItem(searchRequest, pageable));
     }
 
     @GetMapping("/{itemId}")
