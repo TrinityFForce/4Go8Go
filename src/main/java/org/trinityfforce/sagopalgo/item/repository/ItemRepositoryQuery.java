@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
+import org.trinityfforce.sagopalgo.item.dto.response.ItemInfoResponse;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 import org.trinityfforce.sagopalgo.item.entity.Item;
 

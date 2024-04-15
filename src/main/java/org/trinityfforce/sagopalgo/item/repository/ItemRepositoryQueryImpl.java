@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
+import org.trinityfforce.sagopalgo.item.dto.response.ItemInfoResponse;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 import org.trinityfforce.sagopalgo.item.entity.Item;
 import org.trinityfforce.sagopalgo.item.entity.ItemStatusEnum;

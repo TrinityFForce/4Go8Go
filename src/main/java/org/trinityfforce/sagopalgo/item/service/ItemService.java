@@ -20,6 +20,7 @@ import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.OptionRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.RelistRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
+import org.trinityfforce.sagopalgo.item.dto.response.ItemInfoResponse;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 import org.trinityfforce.sagopalgo.item.dto.response.ResultResponse;
 import org.trinityfforce.sagopalgo.item.entity.Item;
@@ -73,10 +74,10 @@ public class ItemService {
 
     @Transactional
     @CacheEvict(value = "item", allEntries = true)
-    public ItemResponse getItemById(Long itemId) throws BadRequestException {
+    public ItemInfoResponse getItemById(Long itemId) throws BadRequestException {
         Item item = getItem(itemId);
         item.addViewCount();
-        return new ItemResponse(item);
+        return new ItemInfoResponse(item);
     }
 
     @Transactional

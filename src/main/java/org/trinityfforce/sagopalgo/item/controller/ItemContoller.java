@@ -25,6 +25,7 @@ import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.OptionRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.RelistRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
+import org.trinityfforce.sagopalgo.item.dto.response.ItemInfoResponse;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 import org.trinityfforce.sagopalgo.item.dto.response.ResultResponse;
 import org.trinityfforce.sagopalgo.item.service.ItemService;
@@ -69,7 +70,7 @@ public class ItemContoller {
 
     @GetMapping("/{itemId}")
     @Operation(summary = "상품 단일 조회", description = "상품 ID를 통해 상품을 조회한다.")
-    public ResponseEntity<ItemResponse> getItemById(@PathVariable Long itemId)
+    public ResponseEntity<ItemInfoResponse> getItemById(@PathVariable Long itemId)
         throws BadRequestException {
         return ResponseEntity.ok(itemService.getItemById(itemId));
     }
