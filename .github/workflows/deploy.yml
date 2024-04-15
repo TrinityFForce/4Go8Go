@@ -2,13 +2,13 @@ name: Deploy to Amazon ECS
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 env:
   AWS_REGION: ap-northeast-2                 # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: trinity-force-repository           # set this to your Amazon ECR repository name
-  ECS_SERVICE: sagopalgo-service                 # set this to your Amazon ECS service name
-  ECS_CLUSTER: sagopalgo-cluster                 # set this to your Amazon ECS cluster name
+  ECR_REPOSITORY: sagopalgo           # set this to your Amazon ECR repository name
+  ECS_SERVICE: sagopalgo-ecs                 # set this to your Amazon ECS service name
+  ECS_CLUSTER: demo-ecs                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: sagopalgo-server # set this to the path to your Amazon ECS task definition
   CONTAINER_NAME: sagopalgo-server           # set this to the name of the container in the
   # containerDefinitions section of your task definition
