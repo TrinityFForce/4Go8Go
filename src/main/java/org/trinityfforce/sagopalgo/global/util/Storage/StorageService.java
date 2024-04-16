@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public class StorageUtils {
+public class StorageService {
 
     @Value("${cloud.aws.bucket.name}")
     private String bucket;

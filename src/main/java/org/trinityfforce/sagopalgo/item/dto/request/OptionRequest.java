@@ -7,7 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OptionRequest {
-
+    private String name;
+    private String category;
+    private String status;
     private int page;
     private int size;
     private String option;

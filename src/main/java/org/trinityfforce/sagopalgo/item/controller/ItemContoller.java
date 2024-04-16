@@ -4,6 +4,7 @@ package org.trinityfforce.sagopalgo.item.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +20,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.trinityfforce.sagopalgo.global.security.UserDetailsImpl;
+import org.trinityfforce.sagopalgo.global.util.Storage.BucketFolder;
+import org.trinityfforce.sagopalgo.global.util.Storage.StorageService;
 import org.trinityfforce.sagopalgo.item.dto.request.ItemRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.OptionRequest;
 import org.trinityfforce.sagopalgo.item.dto.request.RelistRequest;
@@ -36,6 +41,7 @@ import org.trinityfforce.sagopalgo.item.service.ItemService;
 public class ItemContoller {
 
     private final ItemService itemService;
+    private final StorageService storageService;
 
     @PostMapping
     @Operation(summary = "상품 등록", description = "상품을 등록한다.")
@@ -106,5 +112,11 @@ public class ItemContoller {
         return ResponseEntity.ok(itemService.getSales(userDetails.getUser()));
     }
 
-
+    @PostMapping("/image/upload")
+    public ResponseEntity uploadImage(
+        @RequestParam("image") MultipartFile file
+    ) throws IOException {
+        String imageUrl = storageService.uploadFile(file, BucketFolder.image);
+        return ResponseEntity.ok(imageUrl);
+    }
 }
