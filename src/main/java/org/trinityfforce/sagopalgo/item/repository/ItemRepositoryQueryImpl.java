@@ -76,7 +76,7 @@ public class ItemRepositoryQueryImpl implements ItemRepositoryQuery {
     }
 
     private BooleanExpression eqCategory(String category) {
-        return category != null ? qItem.category.name.like(category + "%") : null;
+        return category != null ? qItem.category.name.like(category) : null;
     }
 
     private BooleanExpression eqStatus(String status) {
