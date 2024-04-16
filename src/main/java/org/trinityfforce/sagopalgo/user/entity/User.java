@@ -37,6 +37,11 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRoleEnum role;
 
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType;
+
+    private String socialId;
+
     public User(SignUpRequestDto requestDto, String encryptpassword) {
         this.email = requestDto.getEmail();
         this.password = encryptpassword;
@@ -49,5 +54,15 @@ public class User {
         this.email = email;
         this.username = username;
         this.role = role.equals("ROLE_ADMIN") ? UserRoleEnum.ADMIN : UserRoleEnum.USER;
+    }
+
+    public User(String name, String email, String password, SocialType socialType, String socialId,
+        UserRoleEnum role) {
+        this.username = name;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.socialType = socialType;
+        this.socialId = socialId;
     }
 }

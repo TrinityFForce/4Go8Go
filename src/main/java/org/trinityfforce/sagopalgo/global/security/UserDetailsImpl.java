@@ -14,19 +14,17 @@ public class UserDetailsImpl implements UserDetails {
 
     private User user;
 
-    //private String role;
-
     public UserDetailsImpl(User user) {
         this.user = user;
     }
 
-    public UserDetailsImpl(Claims claims) {
+    public UserDetailsImpl(Claims claims){
         Long id = claims.get("id", Long.class);
         String email = claims.get("email", String.class);
-        String username = claims.get("username", String.class);
+        String name = claims.get("name", String.class);
         String role = claims.get("role", String.class);
 
-        this.user = new User(id, email, username, role);
+        this.user = new User(id,email,name,role);
     }
 
     public User getUser() {
@@ -43,6 +41,7 @@ public class UserDetailsImpl implements UserDetails {
         return user.getEmail();
     }
 
+    public String getUserName(){return user.getUsername();}
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> collection = new ArrayList<>();

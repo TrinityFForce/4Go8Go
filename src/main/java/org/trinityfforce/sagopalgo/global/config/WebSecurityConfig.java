@@ -9,17 +9,17 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.trinityfforce.sagopalgo.global.security.JwtAuthenticationFilter;
-import org.trinityfforce.sagopalgo.global.security.JwtAuthorizationFilter;
-import org.trinityfforce.sagopalgo.global.security.UserDetailsServiceImpl;
+import org.trinityfforce.sagopalgo.global.security.jwt.JwtAuthorizationFilter;
 import org.trinityfforce.sagopalgo.global.security.jwt.JwtUtil;
+import org.trinityfforce.sagopalgo.global.security.oauth2.CustomOAuth2UserService;
+import org.trinityfforce.sagopalgo.global.security.oauth2.CustomSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -28,13 +28,9 @@ import org.trinityfforce.sagopalgo.global.security.jwt.JwtUtil;
 public class WebSecurityConfig implements WebMvcConfigurer {
 
     private final JwtUtil jwtUtil;
-    private final UserDetailsServiceImpl userDetailsService;
-    private final AuthenticationConfiguration authenticationConfiguration;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomSuccessHandler customSuccessHandler;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
@@ -42,12 +38,12 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         return configuration.getAuthenticationManager();
     }
 
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil);
-        filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
-        return filter;
-    }
+//    @Bean
+//    public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
+//        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil);
+//        filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
+//        return filter;
+//    }
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
@@ -55,15 +51,27 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     }
 
     @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() { // security를 적용하지 않을 리소스
+        return web -> web.ignoring()
+            .requestMatchers("/error", "/favicon.ico");
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable());
-
+        http.formLogin(auth -> auth.disable());
         http.httpBasic(auth -> auth.disable());
 
         http.sessionManagement((sessionManagement) ->
             sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
 
+        http
+            .oauth2Login((oauth2) -> oauth2
+                .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig.userService(
+                    customOAuth2UserService))
+                .successHandler(customSuccessHandler)
+            );
 
         http.authorizeHttpRequests((authorizeHttpRequests) ->
             authorizeHttpRequests
@@ -74,9 +82,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .anyRequest().authenticated()
         );
 
-
-        http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAfter(jwtAuthorizationFilter(), OAuth2LoginAuthenticationFilter.class);
         return http.build();
     }
 
@@ -88,3 +95,4 @@ public class WebSecurityConfig implements WebMvcConfigurer {
             .allowCredentials(true);
     }
 }
+
