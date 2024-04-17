@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.transaction.annotation.Transactional;
 import org.trinityfforce.sagopalgo.item.dto.request.SearchRequest;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 import org.trinityfforce.sagopalgo.item.entity.Item;
@@ -27,7 +26,6 @@ public class ItemRepositoryQueryImpl implements ItemRepositoryQuery {
     private QItem qItem = QItem.item;
 
     @Override
-    @Transactional
     public Page<ItemResponse> pageItem(SearchRequest searchRequest, Pageable pageable) {
         QueryResults<Item> queryResults = jpaQueryFactory
             .selectFrom(qItem)
@@ -48,7 +46,6 @@ public class ItemRepositoryQueryImpl implements ItemRepositoryQuery {
     }
 
     @Override
-    @Transactional
     public List<Item> getItem(LocalDate date, String condition) {
         return jpaQueryFactory
             .selectFrom(qItem)
@@ -80,7 +77,8 @@ public class ItemRepositoryQueryImpl implements ItemRepositoryQuery {
     }
 
     private BooleanExpression eqStatus(String status) {
-        return status != null ? qItem.status.eq(ItemStatusEnum.valueOf(status)) : null;
+        return status != null ? qItem.status.eq(ItemStatusEnum.valueOf(status.toUpperCase()))
+            : null;
     }
 
     private OrderSpecifier<?> itemSort(Pageable pageable) {
