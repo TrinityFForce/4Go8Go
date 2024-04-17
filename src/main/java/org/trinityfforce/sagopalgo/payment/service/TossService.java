@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.trinityfforce.sagopalgo.payment.dto.request.TossPaymentRequest;
+import org.trinityfforce.sagopalgo.payment.dto.response.PaymentInfoResponse;
 import org.trinityfforce.sagopalgo.payment.dto.response.PaymentResponse;
 import org.trinityfforce.sagopalgo.payment.dto.response.TossPayment;
 import org.trinityfforce.sagopalgo.payment.entity.Payment;
@@ -29,7 +30,7 @@ public class TossService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public PaymentResponse makePayment(Long paymentId, User user,
+    public PaymentInfoResponse makePayment(Long paymentId, User user,
         TossPaymentRequest tossPaymentRequest)        //paymentKey, orderId, amount
         throws BadRequestException {
         Payment payment = getPayment(paymentId);
@@ -53,7 +54,7 @@ public class TossService {
 
         payment.update(
             tossPayment);    //결제 응답에서 필요한 부분만 사용하여 업데이트(receipt, paidAt, method, orderId, provider)
-        return new PaymentResponse(payment);
+        return new PaymentInfoResponse(payment);
     }
 
     private Payment getPayment(Long pamentId) throws BadRequestException {
