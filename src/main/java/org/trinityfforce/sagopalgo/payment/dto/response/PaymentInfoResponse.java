@@ -10,6 +10,7 @@ import org.trinityfforce.sagopalgo.payment.entity.Payment;
 @NoArgsConstructor
 public class PaymentInfoResponse {
 
+    private Long id;
     private Long itemId;
     private String itemName;
     private Integer price;
@@ -20,8 +21,10 @@ public class PaymentInfoResponse {
     private String orderId;
     private String provider;
     private String receipt;
+    private String url;
 
     public PaymentInfoResponse(Payment payment) {
+        this.id = payment.getId();
         this.itemId = payment.getId();
         this.itemName = payment.getItem().getName();
         this.price = payment.getPrice();
@@ -32,5 +35,6 @@ public class PaymentInfoResponse {
         this.orderId = payment.getOrderId();
         this.provider = payment.getProvider();
         this.receipt = payment.getReceipt();
+        this.url = payment.getItem().getUrl();
     }
 }
