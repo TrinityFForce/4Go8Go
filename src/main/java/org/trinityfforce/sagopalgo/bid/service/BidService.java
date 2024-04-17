@@ -13,6 +13,7 @@ import org.trinityfforce.sagopalgo.bid.entity.Bid;
 import org.trinityfforce.sagopalgo.bid.repository.BidRepository;
 import org.trinityfforce.sagopalgo.item.entity.Item;
 import org.trinityfforce.sagopalgo.item.repository.ItemRepository;
+import org.trinityfforce.sagopalgo.item.service.ItemService;
 import org.trinityfforce.sagopalgo.user.entity.User;
 
 import java.util.HashMap;
@@ -28,7 +29,7 @@ public class BidService {
     private final ItemRepository itemRepository;
     private final BidRepository bidRepository;
     private final RedisTemplate<String, HashMap<String, Object>> hashMapRedisTemplate;
-
+    private final ItemService itemService;
     public List<BidResponseDto> getBidOnItem(Long itemId) {
         return bidRepository.findAllByItemId(itemId).stream().map(BidResponseDto::new).toList();
     }
@@ -63,6 +64,7 @@ public class BidService {
 
         bidRepository.save(new Bid(itemId, user, requestDto.getPrice()));
         itemRepository.updateItem(itemId, requestDto.getPrice());
+        itemService.removeCache();
     }
 
     private Integer checkPrice(String itemKey, Long itemId, Integer price)

@@ -1,6 +1,7 @@
 package org.trinityfforce.sagopalgo.item.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,8 +34,8 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final RedisTemplate<String, List<ItemResponse>> listRedisTemplate;
 
-    private final RedisTemplate<String, HashMap<String, Object>> hashMapRedisTemplate;
 
     @Transactional
     @CacheEvict(value = "item", allEntries = true)
@@ -44,13 +45,18 @@ public class ItemService {
         User owner = getUser(user.getId());
 
         itemRepository.save(new Item(itemRequest, category, owner));
+        removeCache();
         return new ResultResponse(200, "OK", "등록되었습니다.");
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "item", cacheManager = "cacheManager", unless = "#result == null")
-    public List<ItemResponse> getItem(LocalDate date, String condition) {
-        List<Item> itemList = itemRepository.getItem(date, condition); // 조회 condition으로 찾아온 상품
+    public List<ItemResponse> getItem() {
+        String key = getDate() + getCondition();
+        List<ItemResponse> itemResponseList = listRedisTemplate.opsForValue().get(key);
+        if(itemResponseList!=null)
+            return itemResponseList;
+        List<Item> itemList = itemRepository.getItem(getDate(), getCondition()); // 조회 condition으로 찾아온 상품
+        listRedisTemplate.opsForValue().set(key, itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList()));
         return itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList());
     }
 
@@ -71,6 +77,7 @@ public class ItemService {
     public ItemInfoResponse getItemById(Long itemId) throws BadRequestException {
         Item item = getItem(itemId);
         item.addViewCount();
+        removeCache();
         return new ItemInfoResponse(item);
     }
 
@@ -85,7 +92,7 @@ public class ItemService {
         isUpdatable(item);
 
         item.update(itemRequest, category);
-
+        removeCache();
         return new ResultResponse(200, "OK", "수정되었습니다.");
     }
 
@@ -99,7 +106,7 @@ public class ItemService {
         isRelistable(item);
 
         item.relist(relistRequest);
-
+        removeCache();
         return new ResultResponse(200, "OK", "재등록 되었습니다.");
     }
 
@@ -112,7 +119,7 @@ public class ItemService {
         isUpdatable(item);
 
         itemRepository.deleteById(item.getId());
-
+        removeCache();
         return new ResultResponse(200, "OK", "삭제되었습니다.");
     }
 
@@ -158,5 +165,24 @@ public class ItemService {
         }
     }
 
+    private LocalDate getDate(){
+        return LocalDate.now();
+    }
+
+    private String getCondition(){
+        LocalDateTime time = LocalDateTime.now();
+        if (time.getHour() < 9) {
+            return "before";
+        } else if (time.getHour() < 18) {
+            return "progress";
+        } else {
+            return "after";
+        }
+    }
+
+    public void removeCache(){
+        String key = getDate() + getCondition();
+        listRedisTemplate.delete(key);
+    }
 
 }

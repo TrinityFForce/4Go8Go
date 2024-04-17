@@ -54,16 +54,7 @@ public class ItemContoller {
     @GetMapping
     @Operation(summary = "추천 목록 조회(시간대)", description = "시간대에 따라 추천 목록을 조회한다.")
     public ResponseEntity<List<ItemResponse>> getItem() {
-        LocalDateTime time = LocalDateTime.now();
-        String condition;   //  조회 condition
-        if (time.getHour() < 9) {
-            condition = "before";
-        } else if (time.getHour() < 18) {
-            condition = "progress";
-        } else {
-            condition = "after";
-        }
-        return ResponseEntity.ok(itemService.getItem(time.toLocalDate(), condition));
+        return ResponseEntity.ok(itemService.getItem());
     }
 
     @GetMapping("/search")
