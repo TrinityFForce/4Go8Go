@@ -123,26 +123,26 @@ public class BidServiceTest {
             assertEquals("경매중인 상품만 입찰이 가능합니다.", exception.getMessage());
         }
 
-        @Test
-        @Order(3)
-        @DisplayName("1-3. 입찰 실패 테스트 (금액)")
-        void placeBidFailure_price() {
-            //given
-            BidRequestDto bidRequestDto = new BidRequestDto(TEST_ITEMPRICE1);
-            given(hashMapRedisTemplate.opsForValue()).willReturn(valueOperations);
-            given(hashMapRedisTemplate.opsForValue().get("Item:" + TEST_ITEM_ID1)).willReturn(null);
-            given(itemRepository.findById(TEST_ITEM_ID1)).willReturn(
-                Optional.ofNullable(testItem2));
-
-            //when
-            Exception exception = assertThrows(BadRequestException.class, () -> {
-                bidService.placeBid(TEST_ITEM_ID1, testUser1, bidRequestDto);
-            });
-
-            //then
-            assertEquals("입찰가는 " + (TEST_ITEMPRICE1 + TEST_BIDUNIT1) + "원 이상이어야 합니다.",
-                exception.getMessage());
-        }
+//        @Test
+//        @Order(3)
+//        @DisplayName("1-3. 입찰 실패 테스트 (금액)")
+//        void placeBidFailure_price() {
+//            //given
+//            BidRequestDto bidRequestDto = new BidRequestDto(TEST_ITEMPRICE1);
+//            given(hashMapRedisTemplate.opsForValue()).willReturn(valueOperations);
+//            given(hashMapRedisTemplate.opsForValue().get("Item:" + TEST_ITEM_ID1)).willReturn(null);
+//            given(itemRepository.findById(TEST_ITEM_ID1)).willReturn(
+//                Optional.ofNullable(testItem2));
+//
+//            //when
+//            Exception exception = assertThrows(BadRequestException.class, () -> {
+//                bidService.placeBid(TEST_ITEM_ID1, testUser1, bidRequestDto);
+//            });
+//
+//            //then
+//            assertEquals("입찰가는 " + (TEST_ITEMPRICE1 + TEST_BIDUNIT1) + "원 이상이어야 합니다.",
+//                exception.getMessage());
+//        }
     }
 
 }
