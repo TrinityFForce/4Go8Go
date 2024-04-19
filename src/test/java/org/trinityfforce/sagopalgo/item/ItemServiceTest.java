@@ -79,12 +79,13 @@ public class ItemServiceTest {
 
     @Nested
     @Order(1)
+    @DisplayName("1. 상품 추가 테스트")
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     class 상품추가테스트 {
 
         @Test
         @Order(1)
-        @DisplayName("1. 상품 추가 성공 테스트")
+        @DisplayName("1-1. 상품 추가 성공 테스트")
         void createItemSuccess() throws BadRequestException {
             //given
             ItemRequest itemRequest = new ItemRequest(TEST_ITEMNAME1, TEST_ITEMPRICE1,
@@ -103,7 +104,7 @@ public class ItemServiceTest {
 
         @Test
         @Order(2)
-        @DisplayName("2. 상품 추가 실패 테스트 (유저)")
+        @DisplayName("1-2. 상품 추가 실패 테스트 (유저)")
         void createItemFailure_User() {
             //given
             ItemRequest itemRequest = new ItemRequest(TEST_ITEMNAME1, TEST_ITEMPRICE1,
@@ -123,7 +124,7 @@ public class ItemServiceTest {
 
         @Test
         @Order(3)
-        @DisplayName("3. 상품 추가 실패 테스트 (카테고리)")
+        @DisplayName("1-3. 상품 추가 실패 테스트 (카테고리)")
         void createItemFailure_Category() {
             //given
             ItemRequest itemRequest = new ItemRequest(TEST_ITEMNAME1, TEST_ITEMPRICE1,
@@ -142,12 +143,13 @@ public class ItemServiceTest {
 
     @Nested
     @Order(2)
+    @DisplayName("2. 상품 수정 테스트")
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     class 상품수정테스트 {
 
         @Test
         @Order(1)
-        @DisplayName("1. 상품 수정 성공 테스트")
+        @DisplayName("2-1. 상품 수정 성공 테스트")
         void updateItemSuccess() throws BadRequestException {
             //given
             ItemRequest itemRequest = new ItemRequest(TEST_ITEMNAME2, TEST_ITEMPRICE2,
@@ -171,7 +173,7 @@ public class ItemServiceTest {
 
         @Test
         @Order(2)
-        @DisplayName("2. 상품 수정 실패 테스트")
+        @DisplayName("2-2. 상품 수정 실패 테스트")
         void updateItemFailure() {
             //given
             ItemRequest itemRequest = new ItemRequest(TEST_ITEMNAME2, TEST_ITEMPRICE2,
@@ -190,7 +192,7 @@ public class ItemServiceTest {
 
         @Test
         @Order(3)
-        @DisplayName("3. 상품 수정 실패 테스트 (권한)")
+        @DisplayName("2-3. 상품 수정 실패 테스트 (권한)")
         void updateItemFailure_Unauthorized() {
             //given
             ItemRequest itemRequest = new ItemRequest(TEST_ITEMNAME2, TEST_ITEMPRICE2,
@@ -214,7 +216,7 @@ public class ItemServiceTest {
 
         @Test
         @Order(4)
-        @DisplayName("4. 상품 수정 실패 테스트 (상태)")
+        @DisplayName("2-4. 상품 수정 실패 테스트 (상태)")
         void updateItemFailure_Status() {
             //given
             ItemRequest itemRequest = new ItemRequest(TEST_ITEMNAME2, TEST_ITEMPRICE2,
@@ -238,7 +240,7 @@ public class ItemServiceTest {
 
         @Test
         @Order(5)
-        @DisplayName("5. 상품 수정 실패 테스트 (카테고리)")
+        @DisplayName("2-5. 상품 수정 실패 테스트 (카테고리)")
         void updateItemFailure_Category() {
             //given
             ItemRequest itemRequest = new ItemRequest(TEST_ITEMNAME2, TEST_ITEMPRICE2,
@@ -260,12 +262,13 @@ public class ItemServiceTest {
 
     @Nested
     @Order(3)
+    @DisplayName("3. 상품 재등록 테스트")
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     class 상품재등록테스트 {
 
         @Test
         @Order(1)
-        @DisplayName("1. 상품 재등록 성공 테스트")
+        @DisplayName("3-1. 상품 재등록 성공 테스트")
         void relistItemSuccess() throws BadRequestException {
             //given
             RelistRequest relistRequest = new RelistRequest(TEST_DATE2);
@@ -285,7 +288,7 @@ public class ItemServiceTest {
 
         @Test
         @Order(2)
-        @DisplayName("2. 상품 재등록 실패 테스트")
+        @DisplayName("3-2. 상품 재등록 실패 테스트")
         void relistItemFailure() {
             //given
             RelistRequest relistRequest = new RelistRequest(TEST_DATE2);
@@ -302,7 +305,7 @@ public class ItemServiceTest {
 
         @Test
         @Order(3)
-        @DisplayName("3. 상품 재등록 실패 테스트 (권한)")
+        @DisplayName("3-3. 상품 재등록 실패 테스트 (권한)")
         void relistItemFailure_Unauthorized() {
             //given
             RelistRequest relistRequest = new RelistRequest(TEST_DATE2);
@@ -322,7 +325,7 @@ public class ItemServiceTest {
 
         @Test
         @Order(4)
-        @DisplayName("4. 상품 재등록 실패 테스트 (상태)")
+        @DisplayName("3-4. 상품 재등록 실패 테스트 (상태)")
         void relistItemFailure_status() {
             //given
             RelistRequest relistRequest = new RelistRequest(TEST_DATE2);
@@ -342,7 +345,7 @@ public class ItemServiceTest {
 
         @Test
         @Order(5)
-        @DisplayName("5. 상품 재등록 실패 테스트 (낙찰)")
+        @DisplayName("3-5. 상품 재등록 실패 테스트 (낙찰)")
         void relistItemFailure_Award() {
             //given
             RelistRequest relistRequest = new RelistRequest(TEST_DATE2);
@@ -363,12 +366,13 @@ public class ItemServiceTest {
 
     @Nested
     @Order(4)
+    @DisplayName("4. 상품 삭제 테스트")
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     class 상품삭제테스트 {
 
         @Test
         @Order(1)
-        @DisplayName("1. 상품 삭제 성공 테스트")
+        @DisplayName("4-1. 상품 삭제 성공 테스트")
         void deleteItemSuccess() throws BadRequestException {
             //given
             given(itemRepository.findById(TEST_ITEM_ID1)).willReturn(
@@ -387,7 +391,7 @@ public class ItemServiceTest {
 
         @Test
         @Order(2)
-        @DisplayName("2. 상품 삭제 실패 테스트")
+        @DisplayName("4-2. 상품 삭제 실패 테스트")
         void deleteItemFailure() {
             //given
             given(itemRepository.findById(TEST_ITEM_ID1)).willReturn(Optional.empty());
@@ -403,7 +407,7 @@ public class ItemServiceTest {
 
         @Test
         @Order(3)
-        @DisplayName("3. 상품 삭제 실패 테스트 (권한)")
+        @DisplayName("4-3. 상품 삭제 실패 테스트 (권한)")
         void deleteItemFailure_Unauthorized() {
             //given
             given(itemRepository.findById(TEST_ITEM_ID1)).willReturn(
@@ -422,7 +426,7 @@ public class ItemServiceTest {
 
         @Test
         @Order(4)
-        @DisplayName("4. 상품 삭제 실패 테스트 (상태)")
+        @DisplayName("4-4. 상품 삭제 실패 테스트 (상태)")
         void deleteItemFailure_Status() {
             //given
             given(itemRepository.findById(TEST_ITEM_ID1)).willReturn(
