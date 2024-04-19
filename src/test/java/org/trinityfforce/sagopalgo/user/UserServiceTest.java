@@ -3,10 +3,12 @@ package org.trinityfforce.sagopalgo.user;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.trinityfforce.sagopalgo.common.TestValue.*;
-import static org.mockito.BDDMockito.given;
+import static org.trinityfforce.sagopalgo.common.TestValue.TEST_EMAIL1;
+import static org.trinityfforce.sagopalgo.common.TestValue.TEST_PASSWORD1;
+import static org.trinityfforce.sagopalgo.common.TestValue.TEST_USERNAME1;
 
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.ClassOrderer;

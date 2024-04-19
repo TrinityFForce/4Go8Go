@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.trinityfforce.sagopalgo.common.TestValue.TEST_BIDUNIT1;
@@ -30,8 +29,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -69,7 +66,6 @@ public class BidServiceTest {
 
     @Mock
     ValueOperations valueOperations;
-
 
 
     private User testUser1;
@@ -119,7 +115,7 @@ public class BidServiceTest {
                 Optional.ofNullable(testItem1));
 
             //when
-            Exception exception = assertThrows(BadRequestException.class, ()->{
+            Exception exception = assertThrows(BadRequestException.class, () -> {
                 bidService.placeBid(TEST_ITEM_ID1, testUser1, bidRequestDto);
             });
 
@@ -139,12 +135,13 @@ public class BidServiceTest {
                 Optional.ofNullable(testItem2));
 
             //when
-            Exception exception = assertThrows(BadRequestException.class, ()->{
+            Exception exception = assertThrows(BadRequestException.class, () -> {
                 bidService.placeBid(TEST_ITEM_ID1, testUser1, bidRequestDto);
             });
 
             //then
-            assertEquals("입찰가는 " + (TEST_ITEMPRICE1+TEST_BIDUNIT1) + "원 이상이어야 합니다.", exception.getMessage());
+            assertEquals("입찰가는 " + (TEST_ITEMPRICE1 + TEST_BIDUNIT1) + "원 이상이어야 합니다.",
+                exception.getMessage());
         }
     }
 
