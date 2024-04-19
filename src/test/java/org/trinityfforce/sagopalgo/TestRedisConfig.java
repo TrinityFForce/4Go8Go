@@ -1,5 +1,7 @@
-package org.trinityfforce.sagopalgo.global.config;
+package org.trinityfforce.sagopalgo;
 
+import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
@@ -17,16 +19,13 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-
-import java.time.Duration;
-import java.util.HashMap;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 
-@Profile("!test")
+@Profile("test")
 @EnableRedisRepositories // redis 활성화
 @EnableCaching
 @Configuration
-public class RedisConfig {
+public class TestRedisConfig {
 
 
     @Value("${spring.data.redis.host}")
