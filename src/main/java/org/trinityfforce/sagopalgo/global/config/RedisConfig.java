@@ -6,6 +6,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Page;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -53,8 +54,8 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, List<ItemResponse>> listRedisTemplate() {
-        RedisTemplate<String, List<ItemResponse>> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, Page<ItemResponse>> listRedisTemplate() {
+        RedisTemplate<String, Page<ItemResponse>> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());

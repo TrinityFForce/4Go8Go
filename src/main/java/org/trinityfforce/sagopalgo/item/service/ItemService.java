@@ -34,7 +34,7 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
-    private final RedisTemplate<String, List<ItemResponse>> listRedisTemplate;
+    private final RedisTemplate<String, Page<ItemResponse>> listRedisTemplate;
 
 
     @Transactional
@@ -50,14 +50,14 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public List<ItemResponse> getItem() {
-        String key = getDate() + getCondition();
-        List<ItemResponse> itemResponseList = listRedisTemplate.opsForValue().get(key);
+    public Page<ItemResponse> getItem(Pageable pageable) {
+        String key = getDate() + getCondition() + pageable;
+        Page<ItemResponse> itemResponseList = listRedisTemplate.opsForValue().get(key);
         if(itemResponseList!=null)
             return itemResponseList;
-        List<Item> itemList = itemRepository.getItem(getDate(), getCondition()); // 조회 condition으로 찾아온 상품
-        listRedisTemplate.opsForValue().set(key, itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList()));
-        return itemList.stream().map(item -> new ItemResponse(item)).collect(Collectors.toList());
+        Page<ItemResponse> itemList = itemRepository.getItem(getDate(), getCondition(), pageable); // 조회 condition으로 찾아온 상품
+        listRedisTemplate.opsForValue().set(key, itemList);
+        return itemList;
     }
 
     @Transactional(readOnly = true)
