@@ -22,7 +22,6 @@ import java.time.Duration;
 import java.util.HashMap;
 import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 
-@Profile("!test")
 @EnableRedisRepositories // redis 활성화
 @EnableCaching
 @Configuration
