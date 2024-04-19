@@ -5,7 +5,7 @@ on:
     branches: [ "feat/test" ]
 
 jobs:
-  deploy:
+  test:
     name: Run test
     runs-on: ubuntu-latest
     environment: production
