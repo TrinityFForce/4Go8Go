@@ -6,11 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.trinityfforce.sagopalgo.common.TestValue.TEST_CATEGORY1;
-import static org.trinityfforce.sagopalgo.common.TestValue.TEST_CATEGORY2;
-import static org.trinityfforce.sagopalgo.common.TestValue.TEST_CATEGORY_ID;
-import static org.trinityfforce.sagopalgo.common.TestValue.TEST_CATEGORY_NAME1;
-import static org.trinityfforce.sagopalgo.common.TestValue.TEST_CATEGORY_NAME2;
+import static org.trinityfforce.sagopalgo.common.TestValue.*;
 
 import java.util.Optional;
 import org.apache.coyote.BadRequestException;
@@ -39,7 +35,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("카테고리 추가 성공 테스트")
-    void addCategory() throws BadRequestException {
+    void addCategorySuccess() throws BadRequestException {
         //given
         AddCategoryRequestDto addCategoryRequestDto = new AddCategoryRequestDto(
             TEST_CATEGORY_NAME1);
@@ -57,7 +53,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("카테고리 추가 실패 테스트 (중복)")
-    void existCategory() {
+    void addCategoryFailure() {
         //given
         AddCategoryRequestDto addCategoryRequestDto = new AddCategoryRequestDto(
             TEST_CATEGORY_NAME1);
@@ -74,7 +70,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("카테고리 수정 성공 테스트")
-    void modifyCategory() throws BadRequestException {
+    void modifyCategorySuccess() throws BadRequestException {
         //given
         ModifyCategoryRequestDto modifyCategoryRequestDto = new ModifyCategoryRequestDto(
             TEST_CATEGORY_NAME2);
@@ -94,7 +90,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("카테고리 수정 실패 테스트")
-    void modifyCategoryFail() {
+    void modifyCategoryFailure() {
         //given
         ModifyCategoryRequestDto modifyCategoryRequestDto = new ModifyCategoryRequestDto(
             TEST_CATEGORY_NAME2);
@@ -111,7 +107,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("카테고리 삭제 성공 테스트")
-    void removeCategory() throws BadRequestException {
+    void removeCategorySuccess() throws BadRequestException {
         //given
         given(categoryRepository.findById(TEST_CATEGORY_ID)).willReturn(
             Optional.of(TEST_CATEGORY1));
@@ -122,7 +118,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("카테고리 삭제 실패 테스트")
-    void removeCategoryFail() throws BadRequestException {
+    void removeCategoryFailure() throws BadRequestException {
         //given
         given(categoryRepository.findById(TEST_CATEGORY_ID)).willReturn(Optional.empty());
 
