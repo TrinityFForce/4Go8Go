@@ -6,7 +6,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.trinityfforce.sagopalgo.common.TestValue.*;
+import static org.trinityfforce.sagopalgo.common.TestValue.TEST_CATEGORY1;
+import static org.trinityfforce.sagopalgo.common.TestValue.TEST_CATEGORY2;
+import static org.trinityfforce.sagopalgo.common.TestValue.TEST_CATEGORY_ID;
+import static org.trinityfforce.sagopalgo.common.TestValue.TEST_CATEGORY_NAME1;
+import static org.trinityfforce.sagopalgo.common.TestValue.TEST_CATEGORY_NAME2;
 
 import java.util.Optional;
 import org.apache.coyote.BadRequestException;
@@ -118,7 +122,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("카테고리 삭제 실패 테스트")
-    void removeCategoryFailure() throws BadRequestException {
+    void removeCategoryFailure(){
         //given
         given(categoryRepository.findById(TEST_CATEGORY_ID)).willReturn(Optional.empty());
 
