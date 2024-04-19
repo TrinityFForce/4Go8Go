@@ -30,6 +30,8 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -65,6 +67,10 @@ public class BidServiceTest {
     @Mock
     ItemService itemService;
 
+    @Mock
+    ValueOperations valueOperations;
+
+
 
     private User testUser1;
     private Item testItem1; //경매전 상품
@@ -89,7 +95,7 @@ public class BidServiceTest {
         void placeBidSuccess() throws BadRequestException {
             //given
             BidRequestDto bidRequestDto = new BidRequestDto(TEST_ITEMPRICE1 + TEST_BIDUNIT1);
-            given(hashMapRedisTemplate.opsForValue()).willReturn(mock(ValueOperations.class));
+            given(hashMapRedisTemplate.opsForValue()).willReturn(valueOperations);
             given(hashMapRedisTemplate.opsForValue().get("Item:" + TEST_ITEM_ID1)).willReturn(null);
             given(itemRepository.findById(TEST_ITEM_ID1)).willReturn(
                 Optional.ofNullable(testItem2));
@@ -107,7 +113,7 @@ public class BidServiceTest {
         void placeBidFailure_Status() {
             //given
             BidRequestDto bidRequestDto = new BidRequestDto(TEST_ITEMPRICE1 + TEST_BIDUNIT1);
-            given(hashMapRedisTemplate.opsForValue()).willReturn(mock(ValueOperations.class));
+            given(hashMapRedisTemplate.opsForValue()).willReturn(valueOperations);
             given(hashMapRedisTemplate.opsForValue().get("Item:" + TEST_ITEM_ID1)).willReturn(null);
             given(itemRepository.findById(TEST_ITEM_ID1)).willReturn(
                 Optional.ofNullable(testItem1));
@@ -127,7 +133,7 @@ public class BidServiceTest {
         void placeBidFailure_price() {
             //given
             BidRequestDto bidRequestDto = new BidRequestDto(TEST_ITEMPRICE1);
-            given(hashMapRedisTemplate.opsForValue()).willReturn(mock(ValueOperations.class));
+            given(hashMapRedisTemplate.opsForValue()).willReturn(valueOperations);
             given(hashMapRedisTemplate.opsForValue().get("Item:" + TEST_ITEM_ID1)).willReturn(null);
             given(itemRepository.findById(TEST_ITEM_ID1)).willReturn(
                 Optional.ofNullable(testItem2));
