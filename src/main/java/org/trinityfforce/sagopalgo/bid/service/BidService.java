@@ -29,7 +29,6 @@ public class BidService {
     private final ItemRepository itemRepository;
     private final BidRepository bidRepository;
     private final RedisTemplate<String, HashMap<String, Object>> hashMapRedisTemplate;
-    private final ItemService itemService;
     public List<BidResponseDto> getBidOnItem(Long itemId) {
         return bidRepository.findAllByItemId(itemId).stream().map(BidResponseDto::new).toList();
     }
@@ -39,8 +38,6 @@ public class BidService {
     }
 
     @Transactional
-//    @WithDistributedLock(lockName = "#itemId")
-    @CacheEvict(value = "item", allEntries = true)
     public void placeBid(Long itemId, User user, BidRequestDto requestDto)
         throws BadRequestException {
         String itemKey = "Item:" + itemId;
@@ -64,7 +61,6 @@ public class BidService {
 
         bidRepository.save(new Bid(itemId, user, requestDto.getPrice()));
         itemRepository.updateItem(itemId, requestDto.getPrice());
-        itemService.removeCache();
     }
 
     private Integer checkPrice(String itemKey, Long itemId, Integer price)
