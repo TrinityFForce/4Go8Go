@@ -2,13 +2,11 @@ package org.trinityfforce.sagopalgo.item.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -38,14 +36,12 @@ public class ItemService {
 
 
     @Transactional
-    @CacheEvict(value = "item", allEntries = true)
     public ResultResponse createItem(ItemRequest itemRequest, User user)
         throws BadRequestException {
         Category category = getCategory(itemRequest.getCategory());
         User owner = getUser(user.getId());
 
         itemRepository.save(new Item(itemRequest, category, owner));
-        removeCache();
         return new ResultResponse(200, "OK", "등록되었습니다.");
     }
 
@@ -53,10 +49,12 @@ public class ItemService {
     public Page<ItemResponse> getItem(Pageable pageable) {
         String key = getDate() + getCondition() + pageable;
         Page<ItemResponse> itemResponseList = listRedisTemplate.opsForValue().get(key);
-        if(itemResponseList!=null)
+        if (itemResponseList != null) {
             return itemResponseList;
-        Page<ItemResponse> itemList = itemRepository.getItem(getDate(), getCondition(), pageable); // 조회 condition으로 찾아온 상품
-        listRedisTemplate.opsForValue().set(key, itemList);
+        }
+        Page<ItemResponse> itemList = itemRepository.getItem(getDate(), getCondition(),
+            pageable); // 조회 condition으로 찾아온 상품
+        listRedisTemplate.opsForValue().set(key, itemList, 5, TimeUnit.SECONDS);
         return itemList;
     }
 
@@ -67,22 +65,25 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "item", cacheManager = "cacheManager", unless = "#result == null")
     public Page<ItemResponse> pageItem(SearchRequest searchRequest, Pageable pageable) {
-        return itemRepository.pageItem(searchRequest, pageable);
+        String key = searchRequest.toString() + pageable;
+        Page<ItemResponse> itemResponseList = listRedisTemplate.opsForValue().get(key);
+        if (itemResponseList != null) {
+            return itemResponseList;
+        }
+        Page<ItemResponse> itemList = itemRepository.pageItem(searchRequest, pageable);
+        listRedisTemplate.opsForValue().set(key, itemList, 5, TimeUnit.SECONDS);
+        return itemList;
     }
 
     @Transactional
-    @CacheEvict(value = "item", allEntries = true)
     public ItemInfoResponse getItemById(Long itemId) throws BadRequestException {
         Item item = getItem(itemId);
         item.addViewCount();
-        removeCache();
         return new ItemInfoResponse(item);
     }
 
     @Transactional
-    @CacheEvict(value = "item", allEntries = true)
     public ResultResponse updateItem(Long itemId, ItemRequest itemRequest, User user)
         throws BadRequestException {
         Item item = getItem(itemId);
@@ -90,36 +91,28 @@ public class ItemService {
         User owner = getUser(user.getId());
         isAuthorized(item, owner.getId());
         isUpdatable(item);
-
         item.update(itemRequest, category);
-        removeCache();
         return new ResultResponse(200, "OK", "수정되었습니다.");
     }
 
     @Transactional
-    @CacheEvict(value = "item", allEntries = true)
     public ResultResponse relistItem(Long itemId, RelistRequest relistRequest, User user)
         throws BadRequestException {
         Item item = getItem(itemId);
         User owner = getUser(user.getId());
         isAuthorized(item, owner.getId());
         isRelistable(item);
-
         item.relist(relistRequest);
-        removeCache();
         return new ResultResponse(200, "OK", "재등록 되었습니다.");
     }
 
     @Transactional
-    @CacheEvict(value = "item", allEntries = true)
     public ResultResponse deleteItem(Long itemId, User user) throws BadRequestException {
         Item item = getItem(itemId);
         User owner = getUser(user.getId());
         isAuthorized(item, owner.getId());
         isUpdatable(item);
-
         itemRepository.deleteById(item.getId());
-        removeCache();
         return new ResultResponse(200, "OK", "삭제되었습니다.");
     }
 
@@ -165,11 +158,11 @@ public class ItemService {
         }
     }
 
-    private LocalDate getDate(){
+    private LocalDate getDate() {
         return LocalDate.now();
     }
 
-    private String getCondition(){
+    private String getCondition() {
         LocalDateTime time = LocalDateTime.now();
         if (time.getHour() < 9) {
             return "before";
@@ -178,11 +171,6 @@ public class ItemService {
         } else {
             return "after";
         }
-    }
-
-    public void removeCache(){
-        String key = getDate() + getCondition();
-        listRedisTemplate.delete(key);
     }
 
 }
