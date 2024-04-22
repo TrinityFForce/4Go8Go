@@ -14,8 +14,8 @@ import static org.trinityfforce.sagopalgo.common.TestValue.TEST_ITEM_ID1;
 import static org.trinityfforce.sagopalgo.common.TestValue.TEST_USER1;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.ClassOrderer;
@@ -36,10 +36,8 @@ import org.trinityfforce.sagopalgo.bid.dto.BidRequestDto;
 import org.trinityfforce.sagopalgo.bid.entity.Bid;
 import org.trinityfforce.sagopalgo.bid.repository.BidRepository;
 import org.trinityfforce.sagopalgo.bid.service.BidService;
-import org.trinityfforce.sagopalgo.item.dto.response.ItemResponse;
 import org.trinityfforce.sagopalgo.item.entity.Item;
 import org.trinityfforce.sagopalgo.item.repository.ItemRepository;
-import org.trinityfforce.sagopalgo.item.service.ItemService;
 import org.trinityfforce.sagopalgo.user.entity.User;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,12 +57,6 @@ public class BidServiceTest {
     RedisTemplate<String, HashMap<String, Object>> hashMapRedisTemplate;
 
     @Mock
-    RedisTemplate<String, List<ItemResponse>> listRedisTemplate;
-
-    @Mock
-    ItemService itemService;
-
-    @Mock
     ValueOperations valueOperations;
 
 
@@ -77,6 +69,8 @@ public class BidServiceTest {
         testUser1 = TEST_USER1;
         testItem1 = TEST_ITEM1;
         testItem2 = TEST_ITEM2;
+        given(hashMapRedisTemplate.opsForValue()).willReturn(valueOperations);
+        given(hashMapRedisTemplate.opsForValue().get("Item:" + TEST_ITEM_ID1)).willReturn(null);
     }
 
     @Nested
@@ -91,10 +85,10 @@ public class BidServiceTest {
         void placeBidSuccess() throws BadRequestException {
             //given
             BidRequestDto bidRequestDto = new BidRequestDto(TEST_ITEMPRICE1 + TEST_BIDUNIT1);
-            given(hashMapRedisTemplate.opsForValue()).willReturn(valueOperations);
-            given(hashMapRedisTemplate.opsForValue().get("Item:" + TEST_ITEM_ID1)).willReturn(null);
             given(itemRepository.findById(TEST_ITEM_ID1)).willReturn(
                 Optional.ofNullable(testItem2));
+            given(hashMapRedisTemplate.getExpire("Item:" + TEST_ITEM_ID1,
+                TimeUnit.SECONDS)).willReturn(-1L);
 
             //when
             bidService.placeBid(TEST_ITEM_ID1, testUser1, bidRequestDto);
@@ -109,8 +103,6 @@ public class BidServiceTest {
         void placeBidFailure_Status() {
             //given
             BidRequestDto bidRequestDto = new BidRequestDto(TEST_ITEMPRICE1 + TEST_BIDUNIT1);
-            given(hashMapRedisTemplate.opsForValue()).willReturn(valueOperations);
-            given(hashMapRedisTemplate.opsForValue().get("Item:" + TEST_ITEM_ID1)).willReturn(null);
             given(itemRepository.findById(TEST_ITEM_ID1)).willReturn(
                 Optional.ofNullable(testItem1));
 
@@ -129,8 +121,6 @@ public class BidServiceTest {
         void placeBidFailure_price() {
             //given
             BidRequestDto bidRequestDto = new BidRequestDto(TEST_ITEMPRICE1);
-            given(hashMapRedisTemplate.opsForValue()).willReturn(valueOperations);
-            given(hashMapRedisTemplate.opsForValue().get("Item:" + TEST_ITEM_ID1)).willReturn(null);
             given(itemRepository.findById(TEST_ITEM_ID1)).willReturn(
                 Optional.ofNullable(testItem2));
 
