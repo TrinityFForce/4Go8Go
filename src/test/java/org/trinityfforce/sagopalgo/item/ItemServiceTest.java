@@ -74,9 +74,6 @@ public class ItemServiceTest {
     @Mock
     ItemRepository itemRepository;
 
-    @Mock
-    RedisTemplate<String, List<ItemResponse>> listRedisTemplate;
-
     private User testUser1; //유저1
     private User testUser2; //유저2
     private Category testCategory1; //카테고리1
