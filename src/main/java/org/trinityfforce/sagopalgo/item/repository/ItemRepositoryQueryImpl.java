@@ -46,12 +46,22 @@ public class ItemRepositoryQueryImpl implements ItemRepositoryQuery {
     }
 
     @Override
-    public List<Item> getItem(LocalDate date, String condition) {
-        return jpaQueryFactory
+    public Page<ItemResponse> getItem(LocalDate date, String condition, Pageable pageable) {
+        QueryResults<Item> queryResults = jpaQueryFactory
             .selectFrom(qItem)
             .where(eqCondition(condition),
                 qItem.startDate.eq(date))
-            .fetch();
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .orderBy(itemSort(pageable))
+            .fetchResults();
+        List<Item> content = queryResults.getResults();
+        List<ItemResponse> itemResponseList = content.stream().map(item -> new ItemResponse(item))
+            .collect(
+                Collectors.toList());
+        Long total = queryResults.getTotal();
+        return new RestPage<>(itemResponseList, pageable.getPageNumber(), pageable.getPageSize(),
+            total);
     }
 
     private BooleanExpression eqCondition(String condition) {

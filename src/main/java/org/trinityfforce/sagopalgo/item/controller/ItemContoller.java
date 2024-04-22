@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
@@ -53,8 +52,10 @@ public class ItemContoller {
 
     @GetMapping
     @Operation(summary = "추천 목록 조회(시간대)", description = "시간대에 따라 추천 목록을 조회한다.")
-    public ResponseEntity<List<ItemResponse>> getItem() {
-        return ResponseEntity.ok(itemService.getItem());
+    public ResponseEntity<Page<ItemResponse>> getItem(@ModelAttribute
+    SearchRequest searchRequest,
+        Pageable pageable) {
+        return ResponseEntity.ok(itemService.getItem(pageable));
     }
 
     @GetMapping("/search")
