@@ -6,15 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.trinityfforce.sagopalgo.global.security.UserDetailsImpl;
 import org.trinityfforce.sagopalgo.payment.dto.request.TossPaymentRequest;
 import org.trinityfforce.sagopalgo.payment.dto.response.PaymentInfoResponse;
-import org.trinityfforce.sagopalgo.payment.dto.response.PaymentResponse;
 import org.trinityfforce.sagopalgo.payment.service.TossService;
 
 @RestController
@@ -25,7 +24,7 @@ public class TossController {
 
     private final TossService tossService;
 
-    @PostMapping("/{paymentId}/toss/confirm")
+    @GetMapping("/{paymentId}/toss/confirm")
     @Operation(summary = "토스 결제", description = "결제 ID를 통해 토스 결제를 진행한다.")
     public ResponseEntity<PaymentInfoResponse> makePayment(
         @AuthenticationPrincipal UserDetailsImpl userDetails, @ModelAttribute

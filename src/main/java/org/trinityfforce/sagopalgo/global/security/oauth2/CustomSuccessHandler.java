@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -35,10 +36,29 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String token = jwtUtil.createJwt(user, role, 60 * 60 * 600000L);
         String refresh = jwtUtil.createJwt(user, role, 60 * 60 * 6000000L);
 
-        response.addCookie(createCookie("accessToken", token));
-        response.addCookie(createCookie("refreshToken", refresh));
-        response.addCookie(createCookie("USER", user.getUsername()));
-        response.sendRedirect("http://localhost:3000/");
+        ResponseCookie cookie = ResponseCookie.from("accessToken", token)
+            .path("/")
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("None")
+            .maxAge(60*60*600000L)
+            .build();
+
+        ResponseCookie refreshToken = ResponseCookie.from("refreshToken", refresh)
+            .path("/")
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("None")
+            .maxAge(60*60*60000000L)
+            .build();
+
+        response.addHeader("Set-Cookie",cookie.toString());
+        response.addHeader("Set-Cookie",refreshToken.toString());
+//        response.addCookie(createCookie("accessToken", token));
+        //response.addCookie(createCookie("refreshToken", refresh));
+        //response.addCookie(createCookie("USER", user.getUsername()));
+        //response.sendRedirect("http://localhost:3000/loginsuccess");
+        response.sendRedirect("https://sagopalgo-frontend.vercel.app/loginsuccess");
     }
 
     private Cookie createCookie(String key, String value) {
@@ -48,7 +68,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         //cookie.setSecure(true);
         cookie.setPath("/");
         //cookie.setHttpOnly(true);
-
         return cookie;
     }
 }

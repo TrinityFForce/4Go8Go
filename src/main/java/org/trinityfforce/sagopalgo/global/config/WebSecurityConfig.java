@@ -31,7 +31,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
 
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
         throws Exception {
@@ -78,7 +77,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                 .permitAll()// resources 접근 허용
                 .requestMatchers("/").permitAll()
-                .requestMatchers("/api/v1/users/**").permitAll()
                 .anyRequest().authenticated()
         );
 
@@ -90,7 +88,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-            .allowedOrigins("http://localhost:3000") // React 애플리케이션의 도메인
+            .allowedOrigins("http://localhost:3000","https://sagopalgo-frontend.vercel.app")
             .allowedMethods("GET", "POST", "PUT", "DELETE")
             .allowCredentials(true);
     }

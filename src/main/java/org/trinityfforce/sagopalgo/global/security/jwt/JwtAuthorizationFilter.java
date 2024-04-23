@@ -27,31 +27,48 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         String requestUri = request.getRequestURI();
 
-        if (requestUri.matches("^\\/login(?:\\/.*)?$") || requestUri.matches(
-            "^\\/oauth2(?:\\/.*)?$") || requestUri.matches("^\\/auth(?:\\/.*)?$")) {
+        if (requestUri.matches("^\\/login(?:\\/.*)?$") ||
+            requestUri.matches("^\\/oauth2(?:\\/.*)?$") ||
+            requestUri.matches("^\\/auth(?:\\/.*)?$")){
             filterChain.doFilter(request, response);
             return;
         }
 
-        String authorizationHeader = request.getHeader("Authorization");
+        Cookie[] cookies = request.getCookies();
+        String accessToken  = null;
+        String refreshToken = null;
 
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+        if (cookies != null && cookies.length > 0) {
+            // 쿠키 배열을 순회하면서 AccessToken을 찾습니다.
+            for (Cookie cookie : cookies) {
+                // 쿠키의 이름이 "accessToken"인 경우 해당 쿠키의 값을 반환합니다.
+                if ("accessToken".equals(cookie.getName())) {
+                    accessToken =  cookie.getValue();
+                }else if("refreshToken".equals(cookie.getName())){
+                    refreshToken = cookie.getValue();
+                }
+            }
+        }
+
+        //String authorizationHeader = request.getHeader("Authorization");
+
+        if (accessToken == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("토큰이 유효하지 않습니다.");
             return;
         }
 
         // JWT 토큰 추출
-        String token = authorizationHeader.substring(7);
+        //String token = authorizationHeader.substring(7);
 
-        if (!jwtUtil.validateToken(token)) {
+        if (!jwtUtil.validateToken(accessToken)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized 상태 설정
             response.getWriter().write("토큰이 유효하지 않습니다."); // 응답으로 메시지 전송
             return;
         }
 
         // 토큰 검증
-        Claims claims = jwtUtil.getUserInfoFromToken(token);
+        Claims claims = jwtUtil.getUserInfoFromToken(accessToken);
         if (claims == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("토큰이 유효하지 않습니다.");
